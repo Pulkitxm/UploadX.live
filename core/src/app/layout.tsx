@@ -1,4 +1,6 @@
+import { NextAuthProvider } from "@/lib/NextAuthProvider";
 import "./globals.css";
+import Navbar from "@/components/Navbar";
 
 export default function RootLayout({
   children,
@@ -7,7 +9,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <NextAuthProvider>
+        <body className="flex h-screen w-screen flex-col overflow-y-auto">
+          <Navbar />
+          <div className="flex-grow">{children}</div>
+        </body>
+      </NextAuthProvider>
     </html>
   );
 }
