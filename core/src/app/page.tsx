@@ -1,15 +1,15 @@
 "use client";
 
-import { signOut } from "next-auth/react";
-import React from "react";
+import { getSession } from "next-auth/react";
+import { useEffect } from "react";
 
-export default function page() {
-  const SignOut = async () => {
-    await signOut();
-  };
-  return (
-    <div>
-      <button onClick={SignOut}>Sign out</button>
-    </div>
-  );
+export default function HomePage() {
+  useEffect(() => {
+    (async () => {
+      const session = await getSession();
+      console.log(session);
+    })();
+  }, []);
+
+  return <div>a</div>;
 }
