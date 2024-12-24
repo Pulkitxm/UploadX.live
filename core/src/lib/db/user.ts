@@ -49,6 +49,7 @@ export async function findUser({
           password: user.password!,
           image: user.image ?? undefined,
           isVerified: user.isVerified,
+          loginType: user.loginType,
         }
       : null,
   };

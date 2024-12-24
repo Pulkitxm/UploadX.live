@@ -58,6 +58,10 @@ export const authConfig: NextAuthConfig = {
           throw new Error(ERROR.INVALID_CREDENTIALS);
         }
 
+        if(user.loginType && user.loginType !== AuthMode.EMAIL) {
+          throw new Error(ERROR.USER_EXISTS_BUT_WITH_GOOGLE_LOGIN);
+        }
+
         const isValid = await comparePassword(
           credentials.password,
           user.password,

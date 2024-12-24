@@ -27,6 +27,7 @@ export const userSchema = z.object({
   image: z.string().optional(),
   isVerified: z.boolean().optional(),
   password: z.string(),
+  loginType: z.nativeEnum(AuthMode).optional(),
 });
 
 export const googleUserSchema = z.object({
