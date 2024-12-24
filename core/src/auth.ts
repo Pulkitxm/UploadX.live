@@ -4,6 +4,7 @@ import { AuthMode, userLoginSchema } from "./types/auth";
 import { Auth } from "./lib/auth";
 import { ERROR } from "./types/error";
 import { isUserVerified } from "./lib/db/user";
+import { getUserImageUrl } from "./utils/user";
 
 export const { handlers, signIn, auth, signOut } = NextAuth({
   ...authConfig,
@@ -25,14 +26,27 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
       ) {
         const mode =
           account.provider === "google" ? AuthMode.GOOGLE : AuthMode.EMAIL;
-        const newUser = new Auth(
-          {
-            name: validatedUser.data.name,
-            email: validatedUser.data.email,
-            image: validatedUser.data.image,
-          },
-          mode,
-        );
+        let newUser: Auth;
+
+        if (mode === AuthMode.GOOGLE) {
+          newUser = new Auth({
+            mode: AuthMode.GOOGLE,
+            user: {
+              name: validatedUser.data.name,
+              email: validatedUser.data.email,
+            },
+            imageUrl: user.image!,
+          });
+        } else {
+          newUser = new Auth({
+            mode: AuthMode.EMAIL,
+            user: {
+              name: validatedUser.data.name,
+              email: validatedUser.data.email,
+            },
+          });
+        }
+
         try {
           const res = await newUser.signIn();
           if (res.status === "success") {
@@ -56,7 +70,6 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
         token.id = user.id!;
         token.email = user.email;
         token.name = user.name;
-        token.picture = user.image!;
         token.isVerified = user.isVerified || false; // Add isVerified status
         token.loginType =
           account?.provider === "google" ? AuthMode.GOOGLE : AuthMode.EMAIL;
@@ -65,15 +78,16 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
+      const { id, isVerified } = await isUserVerified(token.email!);
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.id,
+          id: id!,
           email: token.email,
           name: token.name,
-          image: token.picture,
-          isVerified: await isUserVerified(token.email!),
+          image: getUserImageUrl(id!),
+          isVerified,
         },
       };
     },

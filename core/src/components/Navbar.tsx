@@ -5,19 +5,19 @@ import Image from "next/image";
 
 import Logo from "@/app/icon.png";
 import { signOut, useSession } from "next-auth/react";
-import { Loader, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function Navbar() {
   const session = useSession();
   const isAuthenticated = session?.status === "authenticated";
 
   return (
-    <nav className="flex items-center justify-between bg-white p-4 shadow-xl z-50">
+    <nav className="z-50 flex items-center justify-between bg-white p-4 shadow-xl">
       <Link href="/" className="flex items-center space-x-2">
         <Image src={Logo} alt="UploadX Logo" width={32} height={32} />
         <span className="text-xl font-bold">UploadX</span>
       </Link>
-      <div className="hidden md:block md:mr-2">
+      <div className="hidden md:mr-2 md:block">
         {session.status === "loading" ? (
           <div className="cursor-pointer rounded border-2 border-gray-500 px-4 py-2 text-black">
             <Loader2 className="h-4 w-4 animate-spin rounded-full" />

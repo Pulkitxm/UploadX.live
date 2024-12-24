@@ -8,7 +8,7 @@ export default function NotVerified() {
 
   useEffect(() => {
     if (!session.data?.user.isVerified) setShow(true);
-  }, []);
+  }, [session.data?.user.isVerified]);
 
   if (show)
     return (

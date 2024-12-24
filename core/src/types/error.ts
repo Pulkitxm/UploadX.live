@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
 
+import { MAX_FILE_SIZE } from "@/lib/config";
+
 export enum ERROR {
   USER_NOT_FOUND = "User not found. Please try again.",
   INVALID_USER = "Invalid user, Please try again.",
@@ -19,4 +21,9 @@ export enum ERROR {
   PASSWORDS_DONT_MATCH = "Check you passwords, and try again",
   PASSWORD_MISMATCH = "Passwords do not match, Please try again.",
   REQUIRED = "All fields are required, Please try again.",
+  UPLOAD_FAILED = "File upload failed, Please try again.",
+  FILE_REQUIRED = "File is required, Please try again.",
+  FILE_TOO_LARGE = `File is too large, Please try with a file less than ${
+    MAX_FILE_SIZE / (1024 * 1024)
+  }MB.`,
 }

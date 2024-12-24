@@ -58,7 +58,7 @@ export const authConfig: NextAuthConfig = {
           throw new Error(ERROR.INVALID_CREDENTIALS);
         }
 
-        if(user.loginType && user.loginType !== AuthMode.EMAIL) {
+        if (user.loginType && user.loginType !== AuthMode.EMAIL) {
           throw new Error(ERROR.USER_EXISTS_BUT_WITH_GOOGLE_LOGIN);
         }
 
@@ -71,11 +71,13 @@ export const authConfig: NextAuthConfig = {
           throw new Error(ERROR.INVALID_CREDENTIALS);
         }
 
+        console.log("User successfully authenticated");
+        
+
         return {
           id: user.id,
           name: user.name,
           email: user.email,
-          image: user.image,
           isVerified: user.isVerified ?? false,
           loginType: AuthMode.EMAIL,
         };

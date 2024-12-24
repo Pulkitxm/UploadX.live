@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { signUp } from "@/actions/auth";
 import { FormEvent, useState } from "react";
 import { ERROR } from "@/types/error";
-import { showToast } from "@/lib/toast";
+import { showToast } from "@/components/toast";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -77,6 +77,8 @@ export default function RegisterForm() {
       });
     } else {
       try {
+        console.log("formValues", formValues);
+
         const res = await signUp(formValues);
 
         if (res.status === "error") {
@@ -105,6 +107,8 @@ export default function RegisterForm() {
           });
           setLoading(false);
         }
+      } finally {
+        setLoading(false);
       }
     }
   };

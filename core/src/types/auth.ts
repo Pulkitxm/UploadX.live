@@ -10,32 +10,21 @@ export enum AuthMode {
 export const userLoginSchema = z.object({
   email: z.string().email(),
   name: z.string(),
-  image: z.string().optional(),
 });
 
 export const baseUserSchema = z.object({
   name: z.string(),
   email: z.string().email(),
-  image: z.string().optional(),
   isVerified: z.boolean().optional(),
 });
 
-export const userSchema = z.object({
+export const userSchema = baseUserSchema.extend({
   id: z.string().optional(),
-  name: z.string(),
-  email: z.string().email(),
-  image: z.string().optional(),
-  isVerified: z.boolean().optional(),
   password: z.string(),
   loginType: z.nativeEnum(AuthMode).optional(),
 });
 
-export const googleUserSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  image: z.string().optional(),
-  isVerified: z.boolean().optional(),
-});
+export const googleUserSchema = baseUserSchema;
 
 export type EMAIL_USER = z.infer<typeof userSchema>;
 export type GOOGLE_USER = z.infer<typeof googleUserSchema>;

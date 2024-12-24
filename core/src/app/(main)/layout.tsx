@@ -2,6 +2,7 @@
 
 import NotVerified from "@/components/NotVerified";
 import Sidebar from "@/components/Sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 
@@ -25,11 +26,15 @@ export default function MainAppLayout({
   }
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex h-full flex-col">
       <NotVerified />
-      <div className="flex flex-grow">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <div className="flex flex-grow flex-col">{children}</div>
+        <main className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full w-full">
+            <div className="p-4 md:p-6">{children}</div>
+          </ScrollArea>
+        </main>
       </div>
     </div>
   );

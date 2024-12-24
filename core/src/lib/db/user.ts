@@ -47,7 +47,6 @@ export async function findUser({
           name: user.name,
           email: user.email,
           password: user.password!,
-          image: user.image ?? undefined,
           isVerified: user.isVerified,
           loginType: user.loginType,
         }
@@ -78,8 +77,6 @@ export async function createUser({
       data: {
         name: user.name,
         email: user.email,
-        image:
-          type === AuthMode.GOOGLE ? (user as GOOGLE_USER).image : undefined,
         isVerified: type === AuthMode.GOOGLE,
         loginType: type,
         password,
@@ -91,8 +88,6 @@ export async function createUser({
       data: newUser,
     };
   } catch (error) {
-    console.error("User creation error:", error);
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         const field = error.meta?.target as string[];
@@ -108,7 +103,7 @@ export async function createUser({
   }
 }
 
-export async function isUserVerified(email: string): Promise<boolean> {
+export async function isUserVerified(email: string) {
   try {
     const dbUser = await db.user.findFirst({
       where: {
@@ -116,9 +111,49 @@ export async function isUserVerified(email: string): Promise<boolean> {
       },
     });
 
-    return dbUser?.isVerified ?? false;
+    return {
+      id: dbUser?.id,
+      isVerified: dbUser?.isVerified ?? false,
+    };
   } catch (error) {
     console.error("isUserVerified error:", error);
-    return false;
+    return {
+      id: null,
+      isVerified: false,
+    };
+  }
+}
+
+export async function changeName({
+  id,
+  name,
+}: {
+  id: string;
+  name: string;
+}): Promise<RES_TYPE> {
+  try {
+    const updatedUser = await db.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        isVerified: true,
+        loginType: true,
+      },
+    });
+
+    return {
+      status: "success",
+      data: updatedUser,
+    };
+  } catch (error) {
+    console.error("changeName error:", error);
+    return { status: "error", error: ERROR.DB_ERROR };
   }
 }
