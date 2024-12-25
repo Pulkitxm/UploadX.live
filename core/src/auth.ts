@@ -3,7 +3,7 @@ import { authConfig } from "./lib/auth/config";
 import { AuthMode, userLoginSchema } from "./types/auth";
 import { Auth } from "./lib/auth";
 import { ERROR } from "./types/error";
-import { isUserVerified } from "./lib/db/user";
+import { getUserSessionData } from "./lib/db/user";
 import { getUserImageUrl } from "./utils/user";
 
 export const { handlers, signIn, auth, signOut } = NextAuth({
@@ -70,7 +70,7 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
         token.id = user.id!;
         token.email = user.email;
         token.name = user.name;
-        token.isVerified = user.isVerified || false; // Add isVerified status
+        token.isVerified = user.isVerified || false;
         token.loginType =
           account?.provider === "google" ? AuthMode.GOOGLE : AuthMode.EMAIL;
       }
@@ -78,16 +78,24 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      const { id, isVerified } = await isUserVerified(token.email!);
+      const { id, isVerified, loginType } = await getUserSessionData(
+        token.email!,
+      );
+
+      if (!id || !isVerified || !loginType) {
+        throw new Error(ERROR.SERVER_ERROR);
+      }
+
       return {
         ...session,
         user: {
           ...session.user,
-          id: id!,
+          id,
+          isVerified,
+          loginType,
           email: token.email,
           name: token.name,
           image: getUserImageUrl(id!),
-          isVerified,
         },
       };
     },

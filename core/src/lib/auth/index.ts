@@ -35,7 +35,10 @@ export class Auth {
         name: props.user.name,
         email: props.user.email,
       };
-      this.imageUrl = props.imageUrl;
+
+      const url = props.imageUrl;
+      this.imageUrl = url.split("=")[0];
+      console.log(`imageUrl: ${this.imageUrl}`);
     } else {
       this.user = {
         name: props.user.name,

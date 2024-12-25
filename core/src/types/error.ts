@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import { MAX_FILE_SIZE } from "@/lib/config";
+import { MAX_FILE_SIZE, PROFILE_MAX_FILE_SIZE } from "@/lib/config";
 
 export enum ERROR {
   USER_NOT_FOUND = "User not found. Please try again.",
@@ -26,4 +26,8 @@ export enum ERROR {
   FILE_TOO_LARGE = `File is too large, Please try with a file less than ${
     MAX_FILE_SIZE / (1024 * 1024)
   }MB.`,
+  PROFILE_PIC_TOO_LARGE = `Profile picture is too large, Please try with a file less than ${
+    PROFILE_MAX_FILE_SIZE / (1024 * 1024)
+  }MB.`,
+  SERVER_ERROR = "Server error occurred, Please try again.",
 }

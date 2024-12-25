@@ -1,13 +1,14 @@
 "use client";
 
-import LandingPage from "@/components/LandingPage";
+import { ERROR } from "@/types/error";
 import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
   const session = useSession();
 
   if (session.status === "unauthenticated") {
-    return <LandingPage />;
+    return redirect("/login?error=" + ERROR.UNAUTHORIZED);
   } else if (session.status === "authenticated") {
     return <div>Hey, {session.data?.user.name}</div>;
   }

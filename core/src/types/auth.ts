@@ -5,6 +5,7 @@ import { z } from "zod";
 export enum AuthMode {
   GOOGLE = "GOOGLE",
   EMAIL = "EMAIL",
+  EMAIL_GOOGLE = "EMAIL_GOOGLE",
 }
 
 export const userLoginSchema = z.object({

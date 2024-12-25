@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { ERROR } from "@/types/error";
-import { MAX_FILE_SIZE } from "@/lib/config";
+import { PROFILE_MAX_FILE_SIZE } from "@/lib/config";
 import { RES_TYPE } from "@/types/global";
 import { uploadFile } from "@/utils/storage";
 
@@ -17,11 +17,8 @@ export async function uploadFileAction(
       return { status: "error", error: ERROR.FILE_REQUIRED };
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-      return { status: "error", error: ERROR.FILE_TOO_LARGE };
-    }
-
     const result = await uploadFileOrUrl(file, userId);
+    console.log(`Uploaded file: ${JSON.stringify(result)}`);
 
     return result;
   } catch (error) {
@@ -33,7 +30,14 @@ export async function uploadFileAction(
   }
 }
 
-export async function uploadFileOrUrl(file: File | string, userId: string) {
+export async function uploadFileOrUrl(
+  file: File | string,
+  userId: string,
+): Promise<RES_TYPE> {
+  if (file instanceof File && file.size > PROFILE_MAX_FILE_SIZE) {
+    return { status: "error", error: ERROR.PROFILE_PIC_TOO_LARGE };
+  }
+
   let buffer: Buffer<ArrayBufferLike>;
   let contentType: string;
 

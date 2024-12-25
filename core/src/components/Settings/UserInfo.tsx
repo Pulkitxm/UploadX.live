@@ -39,8 +39,10 @@ export default function UserInfo() {
 
       if (result.status === "success" && result.data?.url) {
         setAvatar(result.data.url + "?t=" + new Date().getTime());
-
-        // TODO: Update user profile with new avatar URL
+        showToast({ message: "Image uploaded successfully", type: "success" });
+      } else if (result.status === "error") {
+        showToast({ type: "error", message: result.error });
+        setLoading(false);
       }
     } catch (error) {
       if (error) {

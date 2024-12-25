@@ -103,17 +103,31 @@ export async function createUser({
   }
 }
 
-export async function isUserVerified(email: string) {
+export async function getUserSessionData(email: string) {
   try {
     const dbUser = await db.user.findFirst({
       where: {
         email,
       },
+      select: {
+        id: true,
+        isVerified: true,
+        loginType: true,
+      },
     });
 
+    if (!dbUser) {
+      return {
+        id: null,
+        isVerified: false,
+        loginType: AuthMode.EMAIL,
+      };
+    }
+
     return {
-      id: dbUser?.id,
-      isVerified: dbUser?.isVerified ?? false,
+      id: dbUser.id,
+      isVerified: dbUser.isVerified,
+      loginType: AuthMode[dbUser.loginType],
     };
   } catch (error) {
     console.error("isUserVerified error:", error);
