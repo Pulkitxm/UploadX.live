@@ -1,16 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Home, Settings, Menu } from "lucide-react";
+import { Settings, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-
-const menuItems = [{ icon: Home, label: "Dashboard", href: "/" }];
+import { SIDEBAR_MENU_ITEMS } from "@/lib/config";
 
 function SidebarContent() {
   return (
-    <div className="flex h-full w-full flex-col space-y-2 py-5">
-      {menuItems.map((item, index) => (
+    <div className="flex h-full w-full flex-col space-y-2 px-2 py-5">
+      {SIDEBAR_MENU_ITEMS.map((item, index) => (
         <Link
           key={index}
           href={item.href}

@@ -1,0 +1,33 @@
+{
+  "name": "deployit-proxy-server",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "nodemon src/index.ts",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,mdx,css,yaml,yml}\"",
+    "check": "prettier --check \"**/*.{ts,tsx,js,jsx,md,mdx,css,yaml,yml}\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.1",
+    "http-proxy": "^1.18.1",
+    "http-proxy-middleware": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "mime-types": "^2.1.35",
+    "pg": "^8.13.0",
+    "prettier": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/http-proxy": "^1.17.15",
+    "@types/jsonwebtoken": "^9.0.7",
+    "ts-node": "^10.9.2"
+  }
+}

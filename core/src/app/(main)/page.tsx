@@ -1,6 +1,7 @@
 "use client";
 
 import { ERROR } from "@/types/error";
+import axios from "axios";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
@@ -10,6 +11,11 @@ export default function HomePage() {
   if (session.status === "unauthenticated") {
     return redirect("/login?error=" + ERROR.UNAUTHORIZED);
   } else if (session.status === "authenticated") {
-    return <div>Hey, {session.data?.user.name}</div>;
+    return (
+      <div className="h-[500px] w-full">
+        <p>Hey, {session.data?.user.name}</p>
+        <img src={session.data?.user.image!} alt="user image" />
+      </div>
+    );
   }
 }

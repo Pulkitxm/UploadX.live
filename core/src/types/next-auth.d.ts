@@ -8,6 +8,7 @@ declare module "next-auth" {
       id: string;
       isVerified: boolean;
       loginType: AuthMode;
+      img_token: string;
     } & DefaultSession["user"];
   }
 

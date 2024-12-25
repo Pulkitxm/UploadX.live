@@ -4,7 +4,8 @@ import { AuthMode, userLoginSchema } from "./types/auth";
 import { Auth } from "./lib/auth";
 import { ERROR } from "./types/error";
 import { getUserSessionData } from "./lib/db/user";
-import { getUserImageUrl } from "./utils/user";
+import { NEXT_PUBLIC_BLOB_BASE_URL, SECRET } from "./lib/constants";
+import { getToken } from "./lib/config";
 
 export const { handlers, signIn, auth, signOut } = NextAuth({
   ...authConfig,
@@ -86,6 +87,8 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
         throw new Error(ERROR.SERVER_ERROR);
       }
 
+      const img_token = getToken(id, SECRET);
+      
       return {
         ...session,
         user: {
@@ -95,7 +98,8 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
           loginType,
           email: token.email,
           name: token.name,
-          image: getUserImageUrl(id!),
+          image: NEXT_PUBLIC_BLOB_BASE_URL,
+          img_token,
         },
       };
     },
