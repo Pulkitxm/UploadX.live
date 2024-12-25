@@ -3,31 +3,65 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 export default function LoginForm() {
+  const [loading, setLoading] = useState(false);
+
+  const field: {
+    name: string;
+    type: string;
+    placeholder: string;
+    required: boolean;
+  }[] = [
+    {
+      name: "email",
+      type: "email",
+      placeholder: "Email",
+      required: true,
+    },
+    {
+      name: "password",
+      type: "password",
+      placeholder: "Password",
+      required: true,
+    },
+  ];
+
   return (
     <form
       action={async (formData: FormData) => {
-        const values = {
-          email: formData.get("email") as string,
-          password: formData.get("password") as string,
-        };
-        await signIn("credentials", {
-          ...values,
-          redirect: true,
-          callbackUrl: "/",
-        });
+        try {
+          setLoading(true);
+          const values = {
+            email: formData.get("email") as string,
+            password: formData.get("password") as string,
+          };
+          await signIn("credentials", {
+            ...values,
+            redirect: true,
+            callbackUrl: "/",
+          });
+        } catch (error) {
+          if (error) {
+            setLoading(false);
+          }
+        }
       }}
     >
       <div className="space-y-4">
-        <Input name="email" type="email" placeholder="Email" required />
-        <Input
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-        />
-        <Button className="w-full">Login</Button>
+        {field.map((f, i) => (
+          <Input
+            key={i}
+            name={f.name}
+            type={f.type}
+            placeholder={f.placeholder}
+            required={f.required}
+          />
+        ))}
+        <Button className="w-full" loading={loading}>
+          Login
+        </Button>
       </div>
     </form>
   );

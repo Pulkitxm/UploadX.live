@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { XCircle, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import { ERROR } from "@/types/error";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,6 @@ const LoginError = () => {
     <div className={cn("w-full", "max-w-md")}>
       <div className="mb-4 flex w-full items-center justify-between rounded-lg border-2 border-red-500 p-2 text-red-600">
         <div className="flex gap-2">
-          <XCircle className="h-5 w-5" />
           <div className="text-sm">
             {getErrorMessage(errorFormatted ?? "DEFAULT")}
           </div>

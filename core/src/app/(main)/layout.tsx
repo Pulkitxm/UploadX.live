@@ -2,10 +2,9 @@
 
 import NotVerified from "@/components/NotVerified";
 import Sidebar from "@/components/Sidebar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function MainAppLayout({
   children,
@@ -20,8 +19,6 @@ export default function MainAppLayout({
       const token = session.data.user.img_token;
 
       if (token) {
-        console.log("setting token");
-
         document.cookie =
           "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = `img_token=${token}`;
@@ -29,6 +26,7 @@ export default function MainAppLayout({
     } catch (error) {
       if (error) {
         let a = 1;
+        if (a) a++;
       }
     }
   }, [session.data?.user.img_token]);
@@ -50,11 +48,7 @@ export default function MainAppLayout({
       <NotVerified />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <main className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full w-full">
-            <div className="p-4 md:p-6">{children}</div>
-          </ScrollArea>
-        </main>
+        <main className="flex-1 overflow-hidden">{children}</main>
       </div>
     </div>
   );

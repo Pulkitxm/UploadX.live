@@ -1,9 +1,17 @@
+"use server";
+
 import { AuthMode, EMAIL_USER, GOOGLE_USER } from "@/types/auth";
 import db from "../db";
 import { ERROR } from "@/types/error";
 import { Prisma } from "@prisma/client";
 import { RES_TYPE } from "@/types/global";
 import { hashPassword } from "@/utils/hash";
+import {
+  MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
+  VERIFY_CODE_EXPIRY,
+  VERIFY_CODE_GAP,
+  VERIFY_CODE_RESEND_GAP,
+} from "../config";
 
 export async function findUser({
   email,
@@ -168,6 +176,206 @@ export async function changeName({
     };
   } catch (error) {
     console.error("changeName error:", error);
+    return { status: "error", error: ERROR.DB_ERROR };
+  }
+}
+
+export async function getAttemptsLeft(email: string): Promise<RES_TYPE> {
+  try {
+    const dbUser = await db.user.findFirst({
+      where: {
+        email,
+      },
+      select: {
+        verifyCodeAttempts: true,
+        verifyCodeChangeAttempts: true,
+        lastVerifyAttempt: true,
+        lastVerifyResendAttempt: true,
+      },
+    });
+
+    if (!dbUser) {
+      return {
+        status: "error",
+        error: ERROR.USER_NOT_FOUND,
+      };
+    }
+
+    return {
+      status: "success",
+      data: {
+        verifyCodeAttempts: dbUser.verifyCodeAttempts,
+        verifyCodeChangeAttempts: dbUser.verifyCodeChangeAttempts,
+        lastVerifyAttempt: dbUser.lastVerifyAttempt,
+        lastVerifyResendAttempt: dbUser.lastVerifyResendAttempt,
+      },
+    };
+  } catch (error) {
+    console.error("getAttemptsLeft error:", error);
+    return { status: "error", error: ERROR.DB_ERROR };
+  }
+}
+
+export async function setVerifyCode({
+  email,
+  code,
+}: {
+  email: string;
+  code: string;
+}): Promise<RES_TYPE> {
+  try {
+    const dbUser = await db.user.findFirst({
+      where: {
+        email,
+      },
+      select: {
+        isVerified: true,
+        verifyCode: true,
+        verifyCodeChangeAttempts: true,
+        lastVerifyResendAttempt: true,
+      },
+    });
+
+    if (!dbUser) {
+      return {
+        status: "error",
+        error: ERROR.USER_NOT_FOUND,
+      };
+    } else if (dbUser.isVerified) {
+      return {
+        status: "error",
+        error: ERROR.USER_ALREADY_VERIFIED,
+      };
+    } else if (
+      dbUser.verifyCodeChangeAttempts >=
+        MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT &&
+      dbUser.verifyCodeChangeAttempts > 0
+    ) {
+      return {
+        status: "error",
+        error: ERROR.VERIFY_CODE_ATTEMPTS_EXCEEDED,
+      };
+    } else if (
+      new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime() <
+        VERIFY_CODE_RESEND_GAP &&
+      dbUser.verifyCodeChangeAttempts > 0
+    ) {
+      return {
+        status: "error",
+        error: ERROR.VERIFY_CODE_RESEND_GAP,
+      };
+    }
+
+    const updatedUser = await db.user.update({
+      where: {
+        email,
+      },
+      data: {
+        verifyCode: code,
+        lastVerifyResendAttempt: new Date(),
+        verifyCodeChangeAttempts: dbUser.verifyCodeChangeAttempts + 1,
+      },
+      select: {
+        verifyCodeChangeAttempts: true,
+      },
+    });
+
+    return {
+      status: "success",
+      data: {
+        verifyCodeChangeAttempts: updatedUser.verifyCodeChangeAttempts,
+      },
+    };
+  } catch (error) {
+    console.error("setVerifyCode error:", error);
+    return { status: "error", error: ERROR.DB_ERROR };
+  }
+}
+
+export async function verifyUser({
+  email,
+  code,
+}: {
+  email: string;
+  code: string;
+}): Promise<RES_TYPE> {
+  try {
+    const dbUser = await db.user.findFirst({
+      where: {
+        email,
+      },
+      select: {
+        isVerified: true,
+        verifyCode: true,
+        verifyCodeAttempts: true,
+        lastVerifyAttempt: true,
+        lastVerifyResendAttempt: true,
+      },
+    });
+
+    if (!dbUser) {
+      return {
+        status: "error",
+        error: ERROR.USER_NOT_FOUND,
+      };
+    } else if (dbUser.isVerified) {
+      return {
+        status: "error",
+        error: ERROR.USER_ALREADY_VERIFIED,
+      };
+    } else if (
+      VERIFY_CODE_EXPIRY -
+        (new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime()) <
+      0
+    ) {
+      return {
+        status: "error",
+        error: ERROR.VERIFY_CODE_EXPIRED,
+      };
+    } else if (
+      dbUser.verifyCodeAttempts >= MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
+    ) {
+      return {
+        status: "error",
+        error: ERROR.VERIFY_CODE_ATTEMPTS_EXCEEDED,
+      };
+    } else if (
+      dbUser.lastVerifyAttempt &&
+      new Date().getTime() - dbUser.lastVerifyAttempt.getTime() <
+        VERIFY_CODE_GAP
+    ) {
+      return {
+        status: "error",
+        error: ERROR.VERIFY_CODE_GAP,
+      };
+    } else if (dbUser.verifyCode !== code) {
+      return {
+        status: "error",
+        error: ERROR.INVALID_CODE,
+      };
+    }
+
+    const updatedDbUser = await db.user.update({
+      where: {
+        email,
+      },
+      data: {
+        isVerified: true,
+        verifyCodeAttempts: dbUser.verifyCodeAttempts + 1,
+      },
+      select: {
+        lastVerifyAttempt: true,
+      },
+    });
+
+    return {
+      status: "success",
+      data: {
+        lastVerifyAttempt: updatedDbUser.lastVerifyAttempt,
+      },
+    };
+  } catch (error) {
+    console.error("verifyUser error:", error);
     return { status: "error", error: ERROR.DB_ERROR };
   }
 }

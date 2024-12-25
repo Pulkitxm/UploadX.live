@@ -18,8 +18,6 @@ export async function uploadFileAction(
     }
 
     const result = await uploadFileOrUrl(file, userId);
-    console.log(`Uploaded file: ${JSON.stringify(result)}`);
-
     return result;
   } catch (error) {
     console.error("Upload action error:", error);
@@ -51,7 +49,5 @@ export async function uploadFileOrUrl(
   }
 
   const res = await uploadFile(buffer, userId, contentType);
-  console.log(`Uploaded file: ${JSON.stringify(res)}`);
-
   return res;
 }

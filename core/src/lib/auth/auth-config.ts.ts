@@ -71,9 +71,6 @@ export const authConfig: NextAuthConfig = {
           throw new Error(ERROR.INVALID_CREDENTIALS);
         }
 
-        console.log("User successfully authenticated");
-        
-
         return {
           id: user.id,
           name: user.name,

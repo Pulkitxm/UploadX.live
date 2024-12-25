@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import { authConfig } from "./lib/auth/config";
+import { authConfig } from "./lib/auth/auth-config.ts";
 import { AuthMode, userLoginSchema } from "./types/auth";
 import { Auth } from "./lib/auth";
 import { ERROR } from "./types/error";
@@ -79,29 +79,49 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
     },
 
     async session({ session, token }) {
-      const { id, isVerified, loginType } = await getUserSessionData(
-        token.email!,
-      );
+      try {
+        const { id, isVerified, loginType } = await getUserSessionData(
+          token.email!,
+        );
 
-      if (!id || !isVerified || !loginType) {
-        throw new Error(ERROR.SERVER_ERROR);
+        if (!id) {
+          throw new Error(ERROR.USER_NOT_FOUND);
+        }
+        if (!isVerified) {
+          session.user.isVerified = false;
+        }
+        if (!loginType) {
+          throw new Error(ERROR.INVALID_LOGIN);
+        }
+
+        const img_token = getToken(id, SECRET);
+        if (!img_token) {
+          throw new Error(ERROR.UNAUTHORIZED);
+        }
+
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            id,
+            isVerified: isVerified || false,
+            loginType,
+            email: token.email,
+            name: token.name,
+            image: NEXT_PUBLIC_BLOB_BASE_URL,
+            img_token,
+          },
+        };
+      } catch (error) {
+        console.error("Session error:", error);
+        return {
+          ...session,
+          user: {
+            ...session.user,
+            isVerified: false,
+          },
+        };
       }
-
-      const img_token = getToken(id, SECRET);
-      
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id,
-          isVerified,
-          loginType,
-          email: token.email,
-          name: token.name,
-          image: NEXT_PUBLIC_BLOB_BASE_URL,
-          img_token,
-        },
-      };
     },
 
     async redirect({ url, baseUrl }) {

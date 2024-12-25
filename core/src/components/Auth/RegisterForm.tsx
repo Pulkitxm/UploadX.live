@@ -8,6 +8,7 @@ import { ERROR } from "@/types/error";
 import { showToast } from "@/components/toast";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { sendVerificationEmail } from "@/utils/sendEmail";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -77,8 +78,6 @@ export default function RegisterForm() {
       });
     } else {
       try {
-        console.log("formValues", formValues);
-
         const res = await signUp(formValues);
 
         if (res.status === "error") {
@@ -87,6 +86,16 @@ export default function RegisterForm() {
             type: "error",
           });
         } else {
+          const res = await sendVerificationEmail(formValues.email);
+          console.log(res);
+
+          if (res.status === "error") {
+            return showToast({
+              message: res.error,
+              type: "error",
+            });
+          }
+
           await signIn("credentials", {
             email: formValues.email,
             password: formValues.password,
@@ -122,6 +131,7 @@ export default function RegisterForm() {
           name={input.name}
           placeholder={input.placeholder}
           required={input.required}
+          onChange={() => {}}
         />
       ))}
       <Button type="submit" className="w-full" loading={loading}>

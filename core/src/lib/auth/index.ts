@@ -10,6 +10,7 @@ import { createUser, findUser } from "../db/user";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
 import { uploadFileOrUrl } from "@/actions/upload";
+import { sendVerificationEmail } from "@/utils/sendEmail";
 
 export class Auth {
   user: USER;
@@ -38,7 +39,6 @@ export class Auth {
 
       const url = props.imageUrl;
       this.imageUrl = url.split("=")[0];
-      console.log(`imageUrl: ${this.imageUrl}`);
     } else {
       this.user = {
         name: props.user.name,
@@ -101,5 +101,11 @@ export class Auth {
         return { status: "success" };
       }
     }
+  }
+
+  async verify(): Promise<RES_TYPE> {
+    if (this.user.isVerified) return { status: "success" };
+    const res = await sendVerificationEmail(this.user.email);
+    return res;
   }
 }
