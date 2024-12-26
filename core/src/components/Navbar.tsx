@@ -26,8 +26,10 @@ export default function Navbar() {
           <div className="space-x-4">
             <div
               className="cursor-pointer rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-              onClick={() => {
-                signOut();
+              onClick={async () => {
+                document.cookie =
+                  "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                await signOut();
               }}
             >
               Logout
