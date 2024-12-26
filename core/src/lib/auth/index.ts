@@ -102,10 +102,4 @@ export class Auth {
       }
     }
   }
-
-  async verify(): Promise<RES_TYPE> {
-    if (this.user.isVerified) return { status: "success" };
-    const res = await sendVerificationEmail(this.user.email);
-    return res;
-  }
 }

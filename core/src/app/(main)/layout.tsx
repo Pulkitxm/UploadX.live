@@ -1,5 +1,6 @@
 "use client";
 
+import FileUploader from "@/components/FileUploader";
 import NotVerified from "@/components/NotVerified";
 import Sidebar from "@/components/Sidebar";
 import { Loader2 } from "lucide-react";
@@ -46,6 +47,7 @@ export default function MainAppLayout({
   return (
     <div className="flex h-full flex-col">
       <NotVerified />
+      <FileUploader />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
         <main className="flex-1 overflow-hidden">{children}</main>

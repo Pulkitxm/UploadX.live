@@ -1,5 +1,6 @@
 "use client";
 
+import NavPane from "@/components/Explorer/NavPane";
 import { ERROR } from "@/types/error";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
@@ -11,8 +12,8 @@ export default function HomePage() {
     return redirect("/login?error=" + ERROR.UNAUTHORIZED);
   } else if (session.status === "authenticated") {
     return (
-      <div className="h-[500px] w-full">
-        <p>Hey, {session.data?.user.name}</p>
+      <div>
+        <NavPane />
       </div>
     );
   }

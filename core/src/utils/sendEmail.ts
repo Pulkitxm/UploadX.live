@@ -22,7 +22,14 @@ export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
       return resDb;
     }
 
-    console.log(`resDb: ${resDb}`);
+    console.log(`resDb: ${JSON.stringify(resDb)}`);
+    console.log(
+      JSON.stringify({
+        from: "no-reply@uploadx.live",
+        to: email,
+        subject: "Verify your email",
+      }),
+    );
 
     const res = await resend.emails.send({
       from: "no-reply@uploadx.live",
@@ -34,7 +41,7 @@ export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
       }),
     });
 
-    console.log(`res: ${res}`);
+    console.log(`res: ${JSON.stringify(res)}`);
 
     if (res.error) {
       console.log("sendVerificationEmail error:", res.error);

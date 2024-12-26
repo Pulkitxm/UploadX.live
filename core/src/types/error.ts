@@ -34,6 +34,7 @@ export enum ERROR {
   USER_ALREADY_VERIFIED = "The user's email has already been verified. No further action is required",
   INVALID_CODE = "The verification code provided is invalid. Please enter the correct code and try again",
   VERIFY_CODE_ATTEMPTS_EXCEEDED = "You have exceeded the maximum number of allowed verification attempts. Please try again later",
+  VERIFY_CODE_CHANGE_ATTEMPTS_EXCEEDED = "You have exceeded the maximum number of allowed verification code change attempts. Please try again later",
   VERIFY_CODE_EXPIRED = "The verification code has expired. Please request a new code and try again",
   VERIFY_CODE_RESEND_GAP = "You must wait before requesting a new verification code. Please try again later",
   VERIFY_CODE_GAP = "You must wait before attempting verification again. Please try again in a few minutes",

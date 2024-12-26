@@ -253,7 +253,7 @@ export async function setVerifyCode({
     ) {
       return {
         status: "error",
-        error: ERROR.VERIFY_CODE_ATTEMPTS_EXCEEDED,
+        error: ERROR.VERIFY_CODE_CHANGE_ATTEMPTS_EXCEEDED,
       };
     } else if (
       new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime() <
@@ -323,7 +323,21 @@ export async function verifyUser({
         status: "error",
         error: ERROR.USER_ALREADY_VERIFIED,
       };
-    } else if (
+    }
+
+    await db.user.update({
+      where: {
+        email,
+      },
+      data: {
+        verifyCodeAttempts: dbUser.verifyCodeAttempts + 1,
+      },
+      select: {
+        lastVerifyAttempt: true,
+      },
+    });
+
+    if (
       VERIFY_CODE_EXPIRY -
         (new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime()) <
       0
@@ -361,7 +375,6 @@ export async function verifyUser({
       },
       data: {
         isVerified: true,
-        verifyCodeAttempts: dbUser.verifyCodeAttempts + 1,
       },
       select: {
         lastVerifyAttempt: true,

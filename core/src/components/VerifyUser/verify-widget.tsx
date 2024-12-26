@@ -21,6 +21,7 @@ import {
   MAX_VERIFICATION_ATTEMPTS_LIMIT,
   MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
 } from "@/lib/config";
+import { sendVerificationEmail } from "@/utils/sendEmail";
 
 export default function VerifyEmailWidget({
   initialValue,
@@ -71,11 +72,12 @@ export default function VerifyEmailWidget({
       const result = await verifyUser({ email, code });
 
       if (result.status === "success") {
-        showToast({
-          message: "Email verified successfully!",
-          type: "success",
-        });
+        window.location.reload();
       } else {
+        setUserTries((prev) => ({
+          ...prev,
+          verifyCodeAttempts: prev.verifyCodeAttempts + 1,
+        }));
         showToast({
           message: result.error,
           type: "error",
@@ -108,14 +110,7 @@ export default function VerifyEmailWidget({
     if (!email || !name) return;
     setIsResending(true);
     try {
-      const auth = new Auth({
-        mode: AuthMode.EMAIL,
-        user: {
-          name,
-          email,
-        },
-      });
-      const res = await auth.verify();
+      const res = await sendVerificationEmail(email);
       if (res.status === "success") {
         showToast({
           type: "success",
