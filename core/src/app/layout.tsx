@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import { Toaster } from "sonner";
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {

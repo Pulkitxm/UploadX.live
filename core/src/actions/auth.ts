@@ -8,7 +8,7 @@ import { RES_TYPE } from "@/types/global";
 export async function signUp({
   email,
   name,
-  password,
+  password
 }: {
   name: string;
   password: string;
@@ -22,7 +22,7 @@ export async function signUp({
 
     const newUser = await createUser({
       type: AuthMode.EMAIL,
-      user: { email, name, password },
+      user: { email, name, password }
     });
 
     if (newUser.status === "error") {

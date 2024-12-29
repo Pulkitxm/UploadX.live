@@ -18,14 +18,14 @@ export default function LoginForm() {
       name: "email",
       type: "email",
       placeholder: "Email",
-      required: true,
+      required: true
     },
     {
       name: "password",
       type: "password",
       placeholder: "Password",
-      required: true,
-    },
+      required: true
+    }
   ];
 
   return (
@@ -35,12 +35,12 @@ export default function LoginForm() {
           setLoading(true);
           const values = {
             email: formData.get("email") as string,
-            password: formData.get("password") as string,
+            password: formData.get("password") as string
           };
           await signIn("credentials", {
             ...values,
             redirect: true,
-            callbackUrl: "/",
+            callbackUrl: "/"
           });
         } catch (error) {
           if (error) {

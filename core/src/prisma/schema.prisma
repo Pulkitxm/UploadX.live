@@ -27,4 +27,23 @@ model User {
   verifyCodeAttempts       Int       @default(0)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
+  files                    File[]
+  sharedFiles              File[]    @relation("SharedFiles")
+
+  @@index([email])
+}
+
+model File {
+  id          String   @id @default(cuid())
+  name        String
+  path        String
+  sizeInBytes Int
+  userId      String
+  isDeleted   Boolean  @default(false)
+  isPrivate   Boolean  @default(false)
+  isStarred   Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sharedTo    User[]   @relation("SharedFiles")
 }

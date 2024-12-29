@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 
-import { MAX_FILE_SIZE, PROFILE_MAX_FILE_SIZE } from "@/lib/config";
+export const MAX_FILE_SIZE = 10 * 1024 * 1024;
+export const PROFILE_MAX_FILE_SIZE = 1 * 1024 * 1024;
+export const VERIFY_CODE_EXPIRY = 5 * 60 * 1000;
+export const MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT = 5;
+export const MAX_VERIFICATION_ATTEMPTS_LIMIT = 10;
+export const VERIFY_CODE_RESEND_GAP = 10 * 1000;
+export const VERIFY_CODE_GAP = 5 * 1000;
 
 export enum ERROR {
   USER_NOT_FOUND = "The specified user could not be found in the system. Please ensure you have entered the correct information and try again",
@@ -11,6 +17,7 @@ export enum ERROR {
   DEFAULT = "An error occurred while processing your request. Please try again or contact support for assistance",
   EMAIL_EXISTS = "An account with this email address already exists. Please use a different email or log in with the existing account",
   INVALID_INPUT = "The input provided contains errors. Please check your data and try again",
+  NO_CHANGES = "No changes were made to the user profile. Please update the profile details and try again",
   DB_ERROR = "A database error occurred while processing your request. Please try again later or contact support",
   INVALID_CREDENTIALS = "The credentials you provided are incorrect. Please verify your login details and try again",
   EMAIL_NOT_VERIFIED = "Your email address has not been verified. Please check your inbox for a verification email and complete the process",
@@ -38,4 +45,5 @@ export enum ERROR {
   VERIFY_CODE_EXPIRED = "The verification code has expired. Please request a new code and try again",
   VERIFY_CODE_RESEND_GAP = "You must wait before requesting a new verification code. Please try again later",
   VERIFY_CODE_GAP = "You must wait before attempting verification again. Please try again in a few minutes",
+  INVALID_SESSION = "The session is invalid or has expired. Please log in again to continue"
 }

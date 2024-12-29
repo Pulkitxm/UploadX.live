@@ -21,32 +21,32 @@ export const VERIFY_CODE_RESEND_GAP = 10 * 1000;
 export const VERIFY_CODE_GAP = 5 * 1000;
 
 export const SIDEBAR_MENU_ITEMS = [
-  { icon: SiProtondrive, label: "Explorer", href: "/" },
+  { icon: SiProtondrive, label: "Explorer", href: "/" }
 ];
 
 export const LOGIN_METHODS = [
   {
     name: AuthMode.GOOGLE,
-    icon: FaGoogle,
+    icon: FaGoogle
   },
   {
     name: AuthMode.EMAIL,
-    icon: Mail,
-  },
+    icon: Mail
+  }
 ];
 
 export const SETTINGS_ITEMS = [
   {
     component: UserInfo,
-    show: true,
+    show: true
   },
   {
     component: LoginMethods,
-    show: true,
+    show: true
   },
   {
-    component: PasswordChange,
-  },
+    component: PasswordChange
+  }
 ];
 
 export function getToken(userId: string, s?: string) {

@@ -40,7 +40,7 @@ const LoginError = () => {
               {},
               "",
               window.location.pathname +
-                window.location.search.replace(/(\?|&)error=[^&]*(&|$)/, "$1"),
+                window.location.search.replace(/(\?|&)error=[^&]*(&|$)/, "$1")
             );
           }}
         />

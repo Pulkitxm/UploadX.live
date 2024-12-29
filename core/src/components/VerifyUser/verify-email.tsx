@@ -7,7 +7,7 @@ import {
   Html,
   Preview,
   Section,
-  Text,
+  Text
 } from "@react-email/components";
 
 interface VerifyEmailProps {
@@ -17,7 +17,7 @@ interface VerifyEmailProps {
 
 export default function VerifyEmail({
   verificationCode,
-  verificationUrl,
+  verificationUrl
 }: VerifyEmailProps) {
   return (
     <Html>
@@ -43,7 +43,7 @@ export default function VerifyEmail({
                 paddingLeft: 20,
                 paddingRight: 20,
                 paddingTop: 12,
-                paddingBottom: 12,
+                paddingBottom: 12
               }}
               href={verificationUrl}
             >
@@ -62,7 +62,7 @@ export default function VerifyEmail({
 }
 
 const main = {
-  padding: "60px 0",
+  padding: "60px 0"
 } as const;
 
 const container = {
@@ -72,34 +72,34 @@ const container = {
   boxShadow: "0 2px 4px rgba(0, 0, 0, 0.05)",
   margin: "0 auto",
   padding: "40px 30px",
-  maxWidth: "465px",
+  maxWidth: "465px"
 } as const;
 
 const h1 = {
   color: "#1a1a1a",
   fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "24px",
   fontWeight: "600",
   lineHeight: "40px",
   margin: "0 0 20px",
-  textAlign: "center",
+  textAlign: "center"
 } as const;
 
 const text = {
   color: "#444",
   fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "15px",
   lineHeight: "24px",
-  textAlign: "center",
+  textAlign: "center"
 } as const;
 
 const codeContainer = {
   background: "#f5f5f5",
   borderRadius: "4px",
   margin: "16px 0 32px",
-  padding: "20px 30px",
+  padding: "20px 30px"
 } as const;
 
 const code = {
@@ -111,12 +111,12 @@ const code = {
   lineHeight: "1",
   margin: "0",
   textAlign: "center",
-  wordSpacing: "12px",
+  wordSpacing: "12px"
 } as const;
 
 const buttonContainer = {
   textAlign: "center",
-  margin: "32px 0",
+  margin: "32px 0"
 } as const;
 
 const button = {
@@ -124,7 +124,7 @@ const button = {
   borderRadius: "4px",
   color: "#fff",
   fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "14px",
   fontWeight: "600",
   lineHeight: "1",
@@ -132,15 +132,15 @@ const button = {
   textAlign: "center",
   display: "inline-block",
   padding: "12px 24px",
-  margin: "0 auto",
+  margin: "0 auto"
 } as const;
 
 const footer = {
   color: "#666",
   fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "13px",
   lineHeight: "20px",
   textAlign: "center",
-  margin: "12px 0",
+  margin: "12px 0"
 } as const;

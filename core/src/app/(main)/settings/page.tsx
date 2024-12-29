@@ -10,7 +10,7 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold">Settings</h1>
         {SETTINGS_ITEMS.map(
           ({ component: Component, show }, index) =>
-            show && <Component key={index} />,
+            show && <Component key={index} />
         )}
       </div>
     </ScrollArea>

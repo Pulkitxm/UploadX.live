@@ -11,20 +11,18 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { TbReload } from "react-icons/tb";
-import { AuthMode } from "@/types/auth";
-import { Auth } from "@/lib/auth";
 import { showToast } from "@/components/toast";
 import {
   MAX_VERIFICATION_ATTEMPTS_LIMIT,
-  MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
+  MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
 } from "@/lib/config";
 import { sendVerificationEmail } from "@/utils/sendEmail";
 
 export default function VerifyEmailWidget({
-  initialValue,
+  initialValue
 }: {
   initialValue: string | null;
 }) {
@@ -36,7 +34,7 @@ export default function VerifyEmailWidget({
 
   const [userTries, setUserTries] = useState({
     verifyCodeAttempts: MAX_VERIFICATION_ATTEMPTS_LIMIT,
-    verifyCodeChangeAttempts: MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
+    verifyCodeChangeAttempts: MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
   });
 
   const attemptsLeft = {
@@ -44,7 +42,7 @@ export default function VerifyEmailWidget({
       MAX_VERIFICATION_ATTEMPTS_LIMIT - userTries.verifyCodeAttempts,
     verifyCodeChangeAttempts:
       MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT -
-      userTries.verifyCodeChangeAttempts,
+      userTries.verifyCodeChangeAttempts
   };
 
   const email = session.data?.user?.email || "";
@@ -55,12 +53,12 @@ export default function VerifyEmailWidget({
     if (at.status === "success") {
       setUserTries({
         verifyCodeAttempts: at.data.verifyCodeAttempts,
-        verifyCodeChangeAttempts: at.data.verifyCodeChangeAttempts,
+        verifyCodeChangeAttempts: at.data.verifyCodeChangeAttempts
       });
     } else {
       setUserTries({
         verifyCodeAttempts: MAX_VERIFICATION_ATTEMPTS_LIMIT,
-        verifyCodeChangeAttempts: MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
+        verifyCodeChangeAttempts: MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
       });
     }
   }, [email]);
@@ -76,11 +74,11 @@ export default function VerifyEmailWidget({
       } else {
         setUserTries((prev) => ({
           ...prev,
-          verifyCodeAttempts: prev.verifyCodeAttempts + 1,
+          verifyCodeAttempts: prev.verifyCodeAttempts + 1
         }));
         showToast({
           message: result.error,
-          type: "error",
+          type: "error"
         });
       }
     } catch (error) {
@@ -88,7 +86,7 @@ export default function VerifyEmailWidget({
 
       showToast({
         message: "Failed to verify email. Please try again.",
-        type: "error",
+        type: "error"
       });
     } finally {
       setIsVerifying(false);
@@ -103,7 +101,7 @@ export default function VerifyEmailWidget({
       e.preventDefault();
       handleVerify();
     },
-    [handleVerify],
+    [handleVerify]
   );
 
   const handleResend = useCallback(async () => {
@@ -114,23 +112,23 @@ export default function VerifyEmailWidget({
       if (res.status === "success") {
         showToast({
           type: "success",
-          message: "Verification email sent successfully!",
+          message: "Verification email sent successfully!"
         });
         setUserTries((prev) => ({
           ...prev,
-          verifyCodeChangeAttempts: res.data.verifyCodeChangeAttempts,
+          verifyCodeChangeAttempts: res.data.verifyCodeChangeAttempts
         }));
       } else {
         showToast({
           type: "error",
-          message: res.error,
+          message: res.error
         });
       }
     } catch (error) {
       if (error)
         showToast({
           type: "error",
-          message: "Failed to send verification email. Please try again.",
+          message: "Failed to send verification email. Please try again."
         });
     } finally {
       setIsResending(false);
@@ -152,7 +150,7 @@ export default function VerifyEmailWidget({
         } else {
           showToast({
             message: result.error,
-            type: "error",
+            type: "error"
           });
           setCode("");
         }

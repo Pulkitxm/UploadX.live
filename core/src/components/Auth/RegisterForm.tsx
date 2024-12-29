@@ -24,26 +24,26 @@ export default function RegisterForm() {
       name: "email",
       type: "email",
       placeholder: "Email",
-      required: true,
+      required: true
     },
     {
       name: "name",
       type: "text",
       placeholder: "Name",
-      required: true,
+      required: true
     },
     {
       name: "password",
       type: "password",
       placeholder: "Password",
-      required: true,
+      required: true
     },
     {
       name: "rePassword",
       type: "password",
       placeholder: "Confirm Password",
-      required: true,
-    },
+      required: true
+    }
   ];
 
   const handleSignUp = async (e: FormEvent<HTMLFormElement>) => {
@@ -55,7 +55,7 @@ export default function RegisterForm() {
       email: formData.get("email") as string,
       name: formData.get("name") as string,
       password: formData.get("password") as string,
-      rePassword: formData.get("rePassword") as string,
+      rePassword: formData.get("rePassword") as string
     };
 
     if (
@@ -67,14 +67,14 @@ export default function RegisterForm() {
       setLoading(false);
       return showToast({
         message: ERROR.REQUIRED,
-        type: "error",
+        type: "error"
       });
     }
 
     if (formValues.password !== formValues.rePassword) {
       showToast({
         message: ERROR.PASSWORD_MISMATCH,
-        type: "error",
+        type: "error"
       });
     } else {
       try {
@@ -83,7 +83,7 @@ export default function RegisterForm() {
         if (res.status === "error") {
           showToast({
             message: res.error,
-            type: "error",
+            type: "error"
           });
         } else {
           const res = await sendVerificationEmail(formValues.email);
@@ -92,27 +92,27 @@ export default function RegisterForm() {
           if (res.status === "error") {
             return showToast({
               message: res.error,
-              type: "error",
+              type: "error"
             });
           }
 
           await signIn("credentials", {
             email: formValues.email,
             password: formValues.password,
-            callbackUrl: "/",
+            callbackUrl: "/"
           });
 
           router.push("/");
           showToast({
             message: "You have successfully registered",
-            type: "success",
+            type: "success"
           });
         }
       } catch (error) {
         if (error) {
           showToast({
             message: ERROR.UNEXPECTED,
-            type: "error",
+            type: "error"
           });
           setLoading(false);
         }

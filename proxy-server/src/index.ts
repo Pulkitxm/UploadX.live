@@ -26,7 +26,6 @@ proxy.on("proxyReq", (proxyReq, req: any) => {
       console.log(proxyReq.path);
     }
 
-    proxyReq.setHeader("X-Forwarded-Host", req.headers.host!);
     proxyReq.setHeader("Server", SERVER_NAME);
   } catch (error) {
     console.error("Error in proxyReq", error);

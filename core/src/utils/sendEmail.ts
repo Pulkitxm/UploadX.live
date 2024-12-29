@@ -27,8 +27,8 @@ export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
       JSON.stringify({
         from: "no-reply@uploadx.live",
         to: email,
-        subject: "Verify your email",
-      }),
+        subject: "Verify your email"
+      })
     );
 
     const res = await resend.emails.send({
@@ -37,8 +37,8 @@ export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
       subject: "Verify your email",
       react: VerifyEmail({
         verificationCode: code,
-        verificationUrl: verifyUrl,
-      }),
+        verificationUrl: verifyUrl
+      })
     });
 
     console.log(`res: ${JSON.stringify(res)}`);
@@ -52,8 +52,8 @@ export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
     return {
       status: "success",
       data: {
-        verifyCodeChangeAttempts: resDb.data.verifyCodeChangeAttempts,
-      },
+        verifyCodeChangeAttempts: resDb.data.verifyCodeChangeAttempts
+      }
     };
   } catch (error) {
     console.error("sendVerificationEmail error:", error);

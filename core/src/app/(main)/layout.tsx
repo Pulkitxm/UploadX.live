@@ -8,7 +8,7 @@ import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 export default function MainAppLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {

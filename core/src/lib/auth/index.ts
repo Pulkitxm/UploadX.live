@@ -4,13 +4,12 @@ import {
   GOOGLE_USER,
   googleUserSchema,
   USER,
-  userSchema,
+  userSchema
 } from "@/types/auth";
 import { createUser, findUser } from "../db/user";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
-import { uploadFileOrUrl } from "@/actions/upload";
-import { sendVerificationEmail } from "@/utils/sendEmail";
+import { uploadProfilePic_FileOrUrl } from "@/actions/upload";
 
 export class Auth {
   user: USER;
@@ -28,13 +27,13 @@ export class Auth {
         }
     ) & {
       user: GOOGLE_USER | EMAIL_USER;
-    },
+    }
   ) {
     this.mode = props.mode;
     if (props.mode === AuthMode.GOOGLE) {
       this.user = {
         name: props.user.name,
-        email: props.user.email,
+        email: props.user.email
       };
 
       const url = props.imageUrl;
@@ -42,7 +41,7 @@ export class Auth {
     } else {
       this.user = {
         name: props.user.name,
-        email: props.user.email,
+        email: props.user.email
       };
     }
   }
@@ -61,9 +60,9 @@ export class Auth {
     }
   }
 
-  async uploadGoogleImage(id: string) {
+  async uploadGoogleImage() {
     if (this.mode === AuthMode.GOOGLE && this.imageUrl) {
-      return await uploadFileOrUrl(this.imageUrl, id);
+      return await uploadProfilePic_FileOrUrl(this.imageUrl);
     }
   }
 
@@ -78,11 +77,11 @@ export class Auth {
       if (!dbUser.data) {
         const newDbUser = await createUser({
           user: this.user,
-          type: AuthMode.GOOGLE,
+          type: AuthMode.GOOGLE
         });
 
         if (newDbUser.status === "success") {
-          const res = await this.uploadGoogleImage(newDbUser.data.id);
+          const res = await this.uploadGoogleImage();
 
           if (res?.status === "error") {
             return { status: "error", error: res.error };

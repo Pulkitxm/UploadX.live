@@ -10,26 +10,26 @@ import {
   MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
   VERIFY_CODE_EXPIRY,
   VERIFY_CODE_GAP,
-  VERIFY_CODE_RESEND_GAP,
+  VERIFY_CODE_RESEND_GAP
 } from "../config";
 
 export async function findUser({
   email,
-  mode,
+  mode
 }: {
   email?: string;
   mode: AuthMode;
 }): Promise<RES_TYPE> {
   const user = await db.user.findFirst({
     where: {
-      OR: [{ email }],
-    },
+      OR: [{ email }]
+    }
   });
 
   if (!user && mode === AuthMode.EMAIL) {
     return {
       status: "error",
-      error: ERROR.USER_NOT_FOUND,
+      error: ERROR.USER_NOT_FOUND
     };
   }
 
@@ -37,12 +37,12 @@ export async function findUser({
     if (mode === AuthMode.GOOGLE && user.loginType === AuthMode.EMAIL) {
       return {
         status: "error",
-        error: ERROR.USER_EXISTS_BUT_WITH_EMAIL_LOGIN,
+        error: ERROR.USER_EXISTS_BUT_WITH_EMAIL_LOGIN
       };
     } else if (mode === AuthMode.EMAIL && user.loginType === AuthMode.GOOGLE) {
       return {
         status: "error",
-        error: ERROR.USER_EXISTS_BUT_WITH_GOOGLE_LOGIN,
+        error: ERROR.USER_EXISTS_BUT_WITH_GOOGLE_LOGIN
       };
     }
   }
@@ -56,15 +56,15 @@ export async function findUser({
           email: user.email,
           password: user.password!,
           isVerified: user.isVerified,
-          loginType: user.loginType,
+          loginType: user.loginType
         }
-      : null,
+      : null
   };
 }
 
 export async function createUser({
   type,
-  user,
+  user
 }:
   | {
       user: GOOGLE_USER;
@@ -87,13 +87,13 @@ export async function createUser({
         email: user.email,
         isVerified: type === AuthMode.GOOGLE,
         loginType: type,
-        password,
-      },
+        password
+      }
     });
 
     return {
       status: "success",
-      data: newUser,
+      data: newUser
     };
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -115,20 +115,21 @@ export async function getUserSessionData(email: string) {
   try {
     const dbUser = await db.user.findFirst({
       where: {
-        email,
+        email
       },
       select: {
         id: true,
         isVerified: true,
         loginType: true,
-      },
+        name: true
+      }
     });
 
     if (!dbUser) {
       return {
         id: null,
         isVerified: false,
-        loginType: AuthMode.EMAIL,
+        loginType: AuthMode.EMAIL
       };
     }
 
@@ -136,19 +137,20 @@ export async function getUserSessionData(email: string) {
       id: dbUser.id,
       isVerified: dbUser.isVerified,
       loginType: AuthMode[dbUser.loginType],
+      name: dbUser.name
     };
   } catch (error) {
     console.error("isUserVerified error:", error);
     return {
       id: null,
-      isVerified: false,
+      isVerified: false
     };
   }
 }
 
 export async function changeName({
   id,
-  name,
+  name
 }: {
   id: string;
   name: string;
@@ -156,23 +158,23 @@ export async function changeName({
   try {
     const updatedUser = await db.user.update({
       where: {
-        id,
+        id
       },
       data: {
-        name,
+        name
       },
       select: {
         id: true,
         name: true,
         email: true,
         isVerified: true,
-        loginType: true,
-      },
+        loginType: true
+      }
     });
 
     return {
       status: "success",
-      data: updatedUser,
+      data: updatedUser
     };
   } catch (error) {
     console.error("changeName error:", error);
@@ -184,20 +186,20 @@ export async function getAttemptsLeft(email: string): Promise<RES_TYPE> {
   try {
     const dbUser = await db.user.findFirst({
       where: {
-        email,
+        email
       },
       select: {
         verifyCodeAttempts: true,
         verifyCodeChangeAttempts: true,
         lastVerifyAttempt: true,
-        lastVerifyResendAttempt: true,
-      },
+        lastVerifyResendAttempt: true
+      }
     });
 
     if (!dbUser) {
       return {
         status: "error",
-        error: ERROR.USER_NOT_FOUND,
+        error: ERROR.USER_NOT_FOUND
       };
     }
 
@@ -207,8 +209,8 @@ export async function getAttemptsLeft(email: string): Promise<RES_TYPE> {
         verifyCodeAttempts: dbUser.verifyCodeAttempts,
         verifyCodeChangeAttempts: dbUser.verifyCodeChangeAttempts,
         lastVerifyAttempt: dbUser.lastVerifyAttempt,
-        lastVerifyResendAttempt: dbUser.lastVerifyResendAttempt,
-      },
+        lastVerifyResendAttempt: dbUser.lastVerifyResendAttempt
+      }
     };
   } catch (error) {
     console.error("getAttemptsLeft error:", error);
@@ -218,7 +220,7 @@ export async function getAttemptsLeft(email: string): Promise<RES_TYPE> {
 
 export async function setVerifyCode({
   email,
-  code,
+  code
 }: {
   email: string;
   code: string;
@@ -226,25 +228,25 @@ export async function setVerifyCode({
   try {
     const dbUser = await db.user.findFirst({
       where: {
-        email,
+        email
       },
       select: {
         isVerified: true,
         verifyCode: true,
         verifyCodeChangeAttempts: true,
-        lastVerifyResendAttempt: true,
-      },
+        lastVerifyResendAttempt: true
+      }
     });
 
     if (!dbUser) {
       return {
         status: "error",
-        error: ERROR.USER_NOT_FOUND,
+        error: ERROR.USER_NOT_FOUND
       };
     } else if (dbUser.isVerified) {
       return {
         status: "error",
-        error: ERROR.USER_ALREADY_VERIFIED,
+        error: ERROR.USER_ALREADY_VERIFIED
       };
     } else if (
       dbUser.verifyCodeChangeAttempts >=
@@ -253,7 +255,7 @@ export async function setVerifyCode({
     ) {
       return {
         status: "error",
-        error: ERROR.VERIFY_CODE_CHANGE_ATTEMPTS_EXCEEDED,
+        error: ERROR.VERIFY_CODE_CHANGE_ATTEMPTS_EXCEEDED
       };
     } else if (
       new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime() <
@@ -262,29 +264,29 @@ export async function setVerifyCode({
     ) {
       return {
         status: "error",
-        error: ERROR.VERIFY_CODE_RESEND_GAP,
+        error: ERROR.VERIFY_CODE_RESEND_GAP
       };
     }
 
     const updatedUser = await db.user.update({
       where: {
-        email,
+        email
       },
       data: {
         verifyCode: code,
         lastVerifyResendAttempt: new Date(),
-        verifyCodeChangeAttempts: dbUser.verifyCodeChangeAttempts + 1,
+        verifyCodeChangeAttempts: dbUser.verifyCodeChangeAttempts + 1
       },
       select: {
-        verifyCodeChangeAttempts: true,
-      },
+        verifyCodeChangeAttempts: true
+      }
     });
 
     return {
       status: "success",
       data: {
-        verifyCodeChangeAttempts: updatedUser.verifyCodeChangeAttempts,
-      },
+        verifyCodeChangeAttempts: updatedUser.verifyCodeChangeAttempts
+      }
     };
   } catch (error) {
     console.error("setVerifyCode error:", error);
@@ -294,7 +296,7 @@ export async function setVerifyCode({
 
 export async function verifyUser({
   email,
-  code,
+  code
 }: {
   email: string;
   code: string;
@@ -302,39 +304,39 @@ export async function verifyUser({
   try {
     const dbUser = await db.user.findFirst({
       where: {
-        email,
+        email
       },
       select: {
         isVerified: true,
         verifyCode: true,
         verifyCodeAttempts: true,
         lastVerifyAttempt: true,
-        lastVerifyResendAttempt: true,
-      },
+        lastVerifyResendAttempt: true
+      }
     });
 
     if (!dbUser) {
       return {
         status: "error",
-        error: ERROR.USER_NOT_FOUND,
+        error: ERROR.USER_NOT_FOUND
       };
     } else if (dbUser.isVerified) {
       return {
         status: "error",
-        error: ERROR.USER_ALREADY_VERIFIED,
+        error: ERROR.USER_ALREADY_VERIFIED
       };
     }
 
     await db.user.update({
       where: {
-        email,
+        email
       },
       data: {
-        verifyCodeAttempts: dbUser.verifyCodeAttempts + 1,
+        verifyCodeAttempts: dbUser.verifyCodeAttempts + 1
       },
       select: {
-        lastVerifyAttempt: true,
-      },
+        lastVerifyAttempt: true
+      }
     });
 
     if (
@@ -344,14 +346,14 @@ export async function verifyUser({
     ) {
       return {
         status: "error",
-        error: ERROR.VERIFY_CODE_EXPIRED,
+        error: ERROR.VERIFY_CODE_EXPIRED
       };
     } else if (
       dbUser.verifyCodeAttempts >= MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
     ) {
       return {
         status: "error",
-        error: ERROR.VERIFY_CODE_ATTEMPTS_EXCEEDED,
+        error: ERROR.VERIFY_CODE_ATTEMPTS_EXCEEDED
       };
     } else if (
       dbUser.lastVerifyAttempt &&
@@ -360,32 +362,32 @@ export async function verifyUser({
     ) {
       return {
         status: "error",
-        error: ERROR.VERIFY_CODE_GAP,
+        error: ERROR.VERIFY_CODE_GAP
       };
     } else if (dbUser.verifyCode !== code) {
       return {
         status: "error",
-        error: ERROR.INVALID_CODE,
+        error: ERROR.INVALID_CODE
       };
     }
 
     const updatedDbUser = await db.user.update({
       where: {
-        email,
+        email
       },
       data: {
-        isVerified: true,
+        isVerified: true
       },
       select: {
-        lastVerifyAttempt: true,
-      },
+        lastVerifyAttempt: true
+      }
     });
 
     return {
       status: "success",
       data: {
-        lastVerifyAttempt: updatedDbUser.lastVerifyAttempt,
-      },
+        lastVerifyAttempt: updatedDbUser.lastVerifyAttempt
+      }
     };
   } catch (error) {
     console.error("verifyUser error:", error);

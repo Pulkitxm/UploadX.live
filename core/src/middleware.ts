@@ -23,7 +23,7 @@ export default auth((req) => {
 
   if (isAccessingProtectedRoute(pathname) && !isAuth) {
     return NextResponse.redirect(
-      new URL(`/login?error=${ERROR.UNAUTHORIZED}`, req.url),
+      new URL(`/login?error=${ERROR.UNAUTHORIZED}`, req.url)
     );
   }
 
@@ -40,5 +40,5 @@ const isAccessingProtectedRoute = (pathname: string) =>
   PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"]
 };

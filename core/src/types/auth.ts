@@ -5,24 +5,24 @@ import { z } from "zod";
 export enum AuthMode {
   GOOGLE = "GOOGLE",
   EMAIL = "EMAIL",
-  EMAIL_GOOGLE = "EMAIL_GOOGLE",
+  EMAIL_GOOGLE = "EMAIL_GOOGLE"
 }
 
 export const userLoginSchema = z.object({
   email: z.string().email(),
-  name: z.string(),
+  name: z.string()
 });
 
 export const baseUserSchema = z.object({
   name: z.string(),
   email: z.string().email(),
-  isVerified: z.boolean().optional(),
+  isVerified: z.boolean().optional()
 });
 
 export const userSchema = baseUserSchema.extend({
   id: z.string().optional(),
   password: z.string(),
-  loginType: z.nativeEnum(AuthMode).optional(),
+  loginType: z.nativeEnum(AuthMode).optional()
 });
 
 export const googleUserSchema = baseUserSchema;

@@ -1,6 +1,6 @@
 "use client";
 
-import { uploadFileAction } from "@/actions/upload";
+import { uploadProfilePic_FileOrUrl } from "@/actions/upload";
 import { useState, useRef, useEffect } from "react";
 import { User, Mail, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,11 +12,12 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { useSession } from "next-auth/react";
 import { showToast } from "@/components/toast";
 import { editUser } from "@/actions/user";
+import { ERROR } from "@/types/error";
 
 export default function UserInfo() {
   const session = useSession();
@@ -32,13 +33,24 @@ export default function UserInfo() {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const file = e.target.files?.[0];
+      if (!file)
+        return showToast({ message: "No file selected", type: "error" });
 
-      const result = await uploadFileAction(formData, session.data?.user?.id);
+      const result = await uploadProfilePic_FileOrUrl(file);
 
-      if (result.status === "success" && result.data?.url) {
-        setAvatar(result.data.url + "?t=" + new Date().getTime());
+      if (result.status === "success") {
+        setAvatar((prev) => {
+          console.log({ prev });
+
+          if (prev) {
+            const url = new URL(prev);
+            url.searchParams.set("t", Date.now().toString());
+
+            return url.toString();
+          }
+          return prev;
+        });
         showToast({ message: "Image uploaded successfully", type: "success" });
       } else if (result.status === "error") {
         showToast({ type: "error", message: result.error });
@@ -55,13 +67,17 @@ export default function UserInfo() {
   const handleNameChange = async () => {
     if (!session.data?.user?.id) return;
 
+    if (name === session.data?.user?.name) {
+      return showToast({ message: ERROR.NO_CHANGES, type: "error" });
+    }
+
     try {
       const response = await editUser({
-        id: session.data?.user?.id,
-        name,
+        name
       });
 
       if (response.status === "success") {
+        await session.update();
         showToast({ message: "Profile updated successfully", type: "success" });
       } else {
         showToast({ message: "Failed to update profile", type: "error" });
@@ -98,6 +114,7 @@ export default function UserInfo() {
               className="hidden"
               accept="image/*"
               onChange={handleImageChange}
+              multiple={false}
             />
           </label>
           <Button

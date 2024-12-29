@@ -11,7 +11,7 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
   ...authConfig,
   pages: {
     signIn: "/login",
-    error: "/login",
+    error: "/login"
   },
   callbacks: {
     async signIn({ account, user }) {
@@ -34,17 +34,17 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
             mode: AuthMode.GOOGLE,
             user: {
               name: validatedUser.data.name,
-              email: validatedUser.data.email,
+              email: validatedUser.data.email
             },
-            imageUrl: user.image!,
+            imageUrl: user.image!
           });
         } else {
           newUser = new Auth({
             mode: AuthMode.EMAIL,
             user: {
               name: validatedUser.data.name,
-              email: validatedUser.data.email,
-            },
+              email: validatedUser.data.email
+            }
           });
         }
 
@@ -78,10 +78,10 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
       return token;
     },
 
-    async session({ session, token }) {
+    async session({ session, token, trigger }) {
       try {
-        const { id, isVerified, loginType } = await getUserSessionData(
-          token.email!,
+        const { id, isVerified, loginType, name } = await getUserSessionData(
+          token.email!
         );
 
         if (!id) {
@@ -99,7 +99,7 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
           throw new Error(ERROR.UNAUTHORIZED);
         }
 
-        return {
+        const newSession = {
           ...session,
           user: {
             ...session.user,
@@ -107,19 +107,27 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
             isVerified: isVerified || false,
             loginType,
             email: token.email,
-            name: token.name,
-            image: ASSETS_SERVR_BASE_URL + "/" + id,
-            img_token,
-          },
+            name,
+            image:
+              ASSETS_SERVR_BASE_URL + "/" + id + "?t=" + new Date().getTime(),
+            img_token
+          }
         };
+
+        if (trigger === "update" && session) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return newSession;
+        }
+
+        return newSession;
       } catch (error) {
         console.error("Session error:", error);
         return {
           ...session,
           user: {
             ...session.user,
-            isVerified: false,
-          },
+            isVerified: false
+          }
         };
       }
     },
@@ -128,6 +136,11 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
-    },
+    }
   },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60
+  }
 });

@@ -14,7 +14,7 @@ const icons = {
   success: <CheckCircle className="h-6 w-6 text-emerald-600" />,
   error: <XCircle className="h-6 w-6 text-red-600" />,
   warning: <AlertCircle className="h-6 w-6 text-amber-600" />,
-  loading: <Loader2 className="h-6 w-6 animate-spin text-sky-600" />,
+  loading: <Loader2 className="h-6 w-6 animate-spin text-sky-600" />
 };
 
 export function showToast({ message, type }: ToastProps) {
@@ -25,7 +25,7 @@ export function showToast({ message, type }: ToastProps) {
     </div>,
     {
       className: "rounded-md border bg-background p-4 shadow-lg",
-      duration: 3000,
-    },
+      duration: 3000
+    }
   );
 }

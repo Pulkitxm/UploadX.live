@@ -17,6 +17,7 @@ export default function SearchBar() {
         className={`h-4 w-4 cursor-pointer text-gray-500 ${
           loading ? "animate-spin" : ""
         }`}
+        onClick={(prev) => setLoading(!prev)}
       />
       <input
         ref={inputRef}

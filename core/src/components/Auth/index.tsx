@@ -4,7 +4,7 @@ import {
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { AuthGoogle } from "@/components/Auth/AuthWithGoogle";
 import LoginError from "@/components/LoginError";
@@ -27,7 +27,7 @@ export default function Auth({ mode }: { mode: "login" | "register" }) {
               {
                 {
                   login: "Login to UploadX",
-                  register: "Register for UploadX",
+                  register: "Register for UploadX"
                 }[mode]
               }
             </CardTitle>

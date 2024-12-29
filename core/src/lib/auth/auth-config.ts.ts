@@ -12,18 +12,18 @@ export const authConfig: NextAuthConfig = {
   providers: [
     Google({
       clientId: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
+      clientSecret: GOOGLE_CLIENT_SECRET
     }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(cred) {
         const crdSchema = z.object({
           email: z.string().email(),
-          password: z.string(),
+          password: z.string()
         });
 
         const res = crdSchema.safeParse(cred);
@@ -40,7 +40,7 @@ export const authConfig: NextAuthConfig = {
 
         const dbUser = await findUser({
           mode: AuthMode.EMAIL,
-          email: credentials.email as string,
+          email: credentials.email as string
         });
 
         if (dbUser.status === "error") {
@@ -64,7 +64,7 @@ export const authConfig: NextAuthConfig = {
 
         const isValid = await comparePassword(
           credentials.password,
-          user.password,
+          user.password
         );
 
         if (!isValid) {
@@ -76,9 +76,9 @@ export const authConfig: NextAuthConfig = {
           name: user.name,
           email: user.email,
           isVerified: user.isVerified ?? false,
-          loginType: AuthMode.EMAIL,
+          loginType: AuthMode.EMAIL
         };
-      },
-    }),
-  ],
+      }
+    })
+  ]
 };
