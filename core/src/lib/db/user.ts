@@ -1,11 +1,9 @@
-"use server";
-
 import { AuthMode, EMAIL_USER, GOOGLE_USER } from "@/types/auth";
 import db from "../db";
 import { ERROR } from "@/types/error";
 import { Prisma } from "@prisma/client";
 import { RES_TYPE } from "@/types/global";
-import { hashPassword } from "@/utils/hash";
+import { comparePassword, hashPassword } from "@/utils/hash";
 import {
   MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
   VERIFY_CODE_EXPIRY,
@@ -182,11 +180,11 @@ export async function changeName({
   }
 }
 
-export async function getAttemptsLeft(email: string): Promise<RES_TYPE> {
+export async function getAttemptsLeft(userId: string): Promise<RES_TYPE> {
   try {
     const dbUser = await db.user.findFirst({
       where: {
-        email
+        id: userId
       },
       select: {
         verifyCodeAttempts: true,
@@ -219,18 +217,29 @@ export async function getAttemptsLeft(email: string): Promise<RES_TYPE> {
 }
 
 export async function setVerifyCode({
+  userId,
   email,
   code
 }: {
+  userId?: string;
   email: string;
   code: string;
 }): Promise<RES_TYPE> {
   try {
+    const OrArr: Prisma.UserWhereInput[] = [];
+
+    if (email) {
+      OrArr.push({ email });
+    }
+    if (userId) {
+      OrArr.push({ id: userId });
+    }
     const dbUser = await db.user.findFirst({
       where: {
-        email
+        OR: OrArr
       },
       select: {
+        id: true,
         isVerified: true,
         verifyCode: true,
         verifyCodeChangeAttempts: true,
@@ -270,7 +279,7 @@ export async function setVerifyCode({
 
     const updatedUser = await db.user.update({
       where: {
-        email
+        id: dbUser.id
       },
       data: {
         verifyCode: code,
@@ -295,16 +304,16 @@ export async function setVerifyCode({
 }
 
 export async function verifyUser({
-  email,
-  code
+  code,
+  userId
 }: {
-  email: string;
   code: string;
+  userId: string;
 }): Promise<RES_TYPE> {
   try {
     const dbUser = await db.user.findFirst({
       where: {
-        email
+        id: userId
       },
       select: {
         isVerified: true,
@@ -329,7 +338,7 @@ export async function verifyUser({
 
     await db.user.update({
       where: {
-        email
+        id: userId
       },
       data: {
         verifyCodeAttempts: dbUser.verifyCodeAttempts + 1
@@ -373,7 +382,7 @@ export async function verifyUser({
 
     const updatedDbUser = await db.user.update({
       where: {
-        email
+        id: userId
       },
       data: {
         isVerified: true
@@ -391,6 +400,69 @@ export async function verifyUser({
     };
   } catch (error) {
     console.error("verifyUser error:", error);
+    return { status: "error", error: ERROR.DB_ERROR };
+  }
+}
+
+export async function resetPassword({
+  password,
+  newPassword,
+  userId
+}: {
+  password: string;
+  userId: string;
+  newPassword: string;
+}): Promise<RES_TYPE> {
+  try {
+    const dbUser = await db.user.findFirst({
+      where: {
+        id: userId
+      },
+      select: {
+        password: true
+      }
+    });
+
+    if (!dbUser || !dbUser.password) {
+      return {
+        status: "error",
+        error: ERROR.USER_NOT_FOUND
+      };
+    }
+
+    const isValid = await comparePassword(password, dbUser.password);
+
+    if (!isValid) {
+      return {
+        status: "error",
+        error: ERROR.INVALID_PASSWORD
+      };
+    }
+
+    const isPassSame = await comparePassword(newPassword, dbUser.password);
+    if (isPassSame) {
+      return {
+        status: "error",
+        error: ERROR.SAME_PASSWORD
+      };
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    await db.user.update({
+      where: {
+        id: userId
+      },
+      data: {
+        password: hashedPassword
+      }
+    });
+
+    return {
+      status: "success"
+    };
+  } catch (error) {
+    console.error("resetPassword error:", error);
     return { status: "error", error: ERROR.DB_ERROR };
   }
 }

@@ -35,7 +35,7 @@ export const LOGIN_METHODS = [
   }
 ];
 
-export const SETTINGS_ITEMS = [
+export const SETTINGS_ITEMS = (LOGIN_TYPE: AuthMode) => [
   {
     component: UserInfo,
     show: true
@@ -45,7 +45,8 @@ export const SETTINGS_ITEMS = [
     show: true
   },
   {
-    component: PasswordChange
+    component: PasswordChange,
+    show: LOGIN_TYPE === AuthMode.EMAIL
   }
 ];
 

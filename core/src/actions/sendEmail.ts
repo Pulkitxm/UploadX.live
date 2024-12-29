@@ -3,33 +3,34 @@
 import VerifyEmail from "@/components/VerifyUser/verify-email";
 import { NEXTAUTH_URL, RESEND_API_KEY } from "@/lib/constants";
 import { setVerifyCode } from "@/lib/db/user";
+import { genVerifyCode } from "@/lib/utils";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
 import { Resend } from "resend";
 
 const resend = new Resend(RESEND_API_KEY);
 
-export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
+export async function sendVerificationEmail({
+  email,
+  userId
+}: {
+  userId?: string;
+  email: string;
+}): Promise<RES_TYPE> {
   try {
     const code = genVerifyCode();
-    const verifyUrl = `${NEXTAUTH_URL}/verify-email?token=${code}`;
-    console.log(`verifyUrl: ${verifyUrl}`);
+    const verifyUrl = `${NEXTAUTH_URL}/api/verify?code=${code}`;
 
-    const resDb = await setVerifyCode({ email, code });
+    const resDb = await setVerifyCode({
+      userId,
+      code,
+      email
+    });
+
     if (resDb.status === "error") {
       console.log("sendVerificationEmail error:", resDb.error);
-
       return resDb;
     }
-
-    console.log(`resDb: ${JSON.stringify(resDb)}`);
-    console.log(
-      JSON.stringify({
-        from: "no-reply@uploadx.live",
-        to: email,
-        subject: "Verify your email"
-      })
-    );
 
     const res = await resend.emails.send({
       from: "no-reply@uploadx.live",
@@ -41,8 +42,6 @@ export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
       })
     });
 
-    console.log(`res: ${JSON.stringify(res)}`);
-
     if (res.error) {
       console.log("sendVerificationEmail error:", res.error);
 
@@ -52,15 +51,12 @@ export async function sendVerificationEmail(email: string): Promise<RES_TYPE> {
     return {
       status: "success",
       data: {
-        verifyCodeChangeAttempts: resDb.data.verifyCodeChangeAttempts
+        verifyCodeChangeAttempts: resDb.data.verifyCodeChangeAttempts,
+        verifyUrl
       }
     };
   } catch (error) {
     console.error("sendVerificationEmail error:", error);
     return { status: "error", error: ERROR.EMAIL_SEND_ERROR };
   }
-}
-
-function genVerifyCode() {
-  return Math.random().toString(36).substring(2, 8);
 }

@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { getAttemptsLeft, verifyUser } from "@/lib/db/user";
+import {
+  getAttemptsLeftWithSession,
+  sendVerificationEmailWithSession,
+  verifyUserWithSession
+} from "@/lib/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +23,6 @@ import {
   MAX_VERIFICATION_ATTEMPTS_LIMIT,
   MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
 } from "@/lib/config";
-import { sendVerificationEmail } from "@/utils/sendEmail";
 
 export default function VerifyEmailWidget({
   initialValue
@@ -49,11 +52,16 @@ export default function VerifyEmailWidget({
   const name = session.data?.user?.name || "";
 
   const handleGetAttemptsLeft = useCallback(async () => {
-    const at = await getAttemptsLeft(email);
+    const at = await getAttemptsLeftWithSession();
     if (at.status === "success") {
+      if (at.data === null) return;
+      const atLeft = at.data as {
+        verifyCodeChangeAttempts: number;
+        verifyCodeAttempts: number;
+      };
       setUserTries({
-        verifyCodeAttempts: at.data.verifyCodeAttempts,
-        verifyCodeChangeAttempts: at.data.verifyCodeChangeAttempts
+        verifyCodeAttempts: atLeft.verifyCodeAttempts,
+        verifyCodeChangeAttempts: atLeft.verifyCodeChangeAttempts
       });
     } else {
       setUserTries({
@@ -61,16 +69,20 @@ export default function VerifyEmailWidget({
         verifyCodeChangeAttempts: MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
       });
     }
-  }, [email]);
+  }, []);
 
   const handleVerify = useCallback(async () => {
     if (!email) return;
     setIsVerifying(true);
     try {
-      const result = await verifyUser({ email, code });
+      const result = await verifyUserWithSession({ code });
 
       if (result.status === "success") {
-        window.location.reload();
+        showToast({
+          type: "success",
+          message: "Email verified successfully!"
+        });
+        await session.update();
       } else {
         setUserTries((prev) => ({
           ...prev,
@@ -94,7 +106,7 @@ export default function VerifyEmailWidget({
         setInitalCallDone(false);
       }
     }
-  }, [email, code, initalCallDone]);
+  }, [email, code, session, initalCallDone]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -108,7 +120,7 @@ export default function VerifyEmailWidget({
     if (!email || !name) return;
     setIsResending(true);
     try {
-      const res = await sendVerificationEmail(email);
+      const res = await sendVerificationEmailWithSession();
       if (res.status === "success") {
         showToast({
           type: "success",
@@ -143,10 +155,10 @@ export default function VerifyEmailWidget({
 
   useEffect(() => {
     if (initialValue && initalCallDone === false) {
-      verifyUser({ email, code: initialValue }).then((result) => {
+      verifyUserWithSession({ code: initialValue }).then(async (result) => {
         if (result.status === "success") {
           setInitalCallDone(true);
-          window.location.reload();
+          await session.update();
         } else {
           showToast({
             message: result.error,
@@ -156,7 +168,7 @@ export default function VerifyEmailWidget({
         }
       });
     }
-  }, [initialValue, email, code, initalCallDone]);
+  }, [initialValue, email, code, initalCallDone, session]);
 
   if (session.status === "loading") {
     return <div>Loading...</div>;

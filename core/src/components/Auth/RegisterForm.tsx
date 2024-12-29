@@ -8,7 +8,8 @@ import { ERROR } from "@/types/error";
 import { showToast } from "@/components/toast";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { sendVerificationEmail } from "@/utils/sendEmail";
+import { Auth } from "@/lib/auth";
+import { AuthMode } from "@/types/auth";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -72,7 +73,8 @@ export default function RegisterForm() {
     }
 
     if (formValues.password !== formValues.rePassword) {
-      showToast({
+      setLoading(false);
+      return showToast({
         message: ERROR.PASSWORD_MISMATCH,
         type: "error"
       });
@@ -86,9 +88,13 @@ export default function RegisterForm() {
             type: "error"
           });
         } else {
-          const res = await sendVerificationEmail(formValues.email);
-          console.log(res);
-
+          const res = await new Auth({
+            mode: AuthMode.EMAIL,
+            user: {
+              name: formValues.name,
+              email: formValues.email
+            }
+          }).sendEmail();
           if (res.status === "error") {
             return showToast({
               message: res.error,
@@ -131,7 +137,6 @@ export default function RegisterForm() {
           name={input.name}
           placeholder={input.placeholder}
           required={input.required}
-          onChange={() => {}}
         />
       ))}
       <Button type="submit" className="w-full" loading={loading}>

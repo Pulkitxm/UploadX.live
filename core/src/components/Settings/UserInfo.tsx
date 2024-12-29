@@ -41,8 +41,6 @@ export default function UserInfo() {
 
       if (result.status === "success") {
         setAvatar((prev) => {
-          console.log({ prev });
-
           if (prev) {
             const url = new URL(prev);
             url.searchParams.set("t", Date.now().toString());
@@ -55,6 +53,8 @@ export default function UserInfo() {
       } else if (result.status === "error") {
         showToast({ type: "error", message: result.error });
         setLoading(false);
+        // clear the input
+        fileInputRef.current!.value = "";
       }
     } catch (error) {
       if (error) {

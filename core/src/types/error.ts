@@ -40,10 +40,13 @@ export enum ERROR {
   EMAIL_SEND_ERROR = "An error occurred while sending the email. Please try again later or contact support",
   USER_ALREADY_VERIFIED = "The user's email has already been verified. No further action is required",
   INVALID_CODE = "The verification code provided is invalid. Please enter the correct code and try again",
-  VERIFY_CODE_ATTEMPTS_EXCEEDED = "You have exceeded the maximum number of allowed verification attempts. Please try again later",
-  VERIFY_CODE_CHANGE_ATTEMPTS_EXCEEDED = "You have exceeded the maximum number of allowed verification code change attempts. Please try again later",
+  VERIFY_CODE_ATTEMPTS_EXCEEDED = "You have exceeded the maximum number of allowed verification attempts. Please contact support for assistance",
+  VERIFY_CODE_CHANGE_ATTEMPTS_EXCEEDED = "You have exceeded the maximum number of allowed verification code change attempts. Please contact support for assistance",
   VERIFY_CODE_EXPIRED = "The verification code has expired. Please request a new code and try again",
   VERIFY_CODE_RESEND_GAP = "You must wait before requesting a new verification code. Please try again later",
   VERIFY_CODE_GAP = "You must wait before attempting verification again. Please try again in a few minutes",
-  INVALID_SESSION = "The session is invalid or has expired. Please log in again to continue"
+  INVALID_SESSION = "The session is invalid or has expired. Please log in again to continue",
+  UNKNOWN = "An unknown error occurred. Please try again later or contact support for assistance",
+  INVALID_PASSWORD = "The password provided is invalid. Please enter a valid password and try again",
+  SAME_PASSWORD = "The new password cannot be the same as the current password. Please enter a different password and try again"
 }

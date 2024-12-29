@@ -10,6 +10,7 @@ import { createUser, findUser } from "../db/user";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
 import { uploadProfilePic_FileOrUrl } from "@/actions/upload";
+import { sendVerificationEmail } from "@/actions/sendEmail";
 
 export class Auth {
   user: USER;
@@ -99,6 +100,16 @@ export class Auth {
       } else {
         return { status: "success" };
       }
+    }
+  }
+
+  async sendEmail(): Promise<RES_TYPE> {
+    if (this.mode === AuthMode.EMAIL) {
+      return await sendVerificationEmail({
+        email: this.user.email
+      });
+    } else {
+      return { status: "error", error: ERROR.INVALID_AUTH_MODE };
     }
   }
 }
