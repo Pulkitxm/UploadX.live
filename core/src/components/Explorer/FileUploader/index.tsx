@@ -1,36 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useContext
+} from "react";
 import { DragOverlay } from "@/components/Explorer/FileUploader/DragOverlay";
 import { UploadManager } from "@/components/Explorer/FileUploader/UploadManager";
 import { showToast } from "@/components/toast";
 import { upload_FileOrUrl } from "@/actions/upload";
 import { FileUpload } from "@/types/file";
 import { useSession } from "next-auth/react";
-import { getFiles, setFiles } from "@/lib/file/util";
+import { UploadManagerMinimize, UploadsContext } from "@/context/upload";
 
 export default function FileUploader() {
-  const { data, status } = useSession();
+  const { status } = useSession();
   const [isDragging, setIsDragging] = useState(false);
-  const [uploads, setUploads] = useState<FileUpload[]>([]);
-  const [isMinimized, setIsMinimized] = useState(true);
+  const { uploads, updateUploads } = useContext(UploadsContext);
+  const { isMinimized, toggleMinimize } = useContext(UploadManagerMinimize);
   const dragCounter = useRef(0);
-  const userId = data?.user?.id;
-
-  const updateUploads = useCallback(
-    (updater: FileUpload[] | ((prevUploads: FileUpload[]) => FileUpload[])) => {
-      setUploads((prevUploads) => {
-        const newUploads =
-          typeof updater === "function" ? updater(prevUploads) : updater;
-        setFiles({
-          userId: userId as string,
-          val: newUploads
-        });
-        return newUploads;
-      });
-    },
-    [userId]
-  );
 
   const handleDrag = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -99,10 +89,10 @@ export default function FileUploader() {
               );
             });
         });
-        setIsMinimized(false);
+        toggleMinimize();
       }
     },
-    [updateUploads]
+    [toggleMinimize, updateUploads]
   );
 
   const handleOpenFile = useCallback(
@@ -170,12 +160,6 @@ export default function FileUploader() {
     };
   }, [handleDrag, handleDragIn, handleDragOut, handleDrop]);
 
-  useEffect(() => {
-    if (!userId) return;
-
-    setUploads(getFiles(userId));
-  }, [userId]);
-
   if (status === "loading") return null;
 
   return (
@@ -183,7 +167,7 @@ export default function FileUploader() {
       <DragOverlay isDragging={isDragging} />
       <UploadManager
         uploads={uploads}
-        onMinimize={() => setIsMinimized(!isMinimized)}
+        toggleMinimize={toggleMinimize}
         isMinimized={isMinimized}
         onOpenFile={handleOpenFile}
         onRemoveFile={handleRemoveFile}

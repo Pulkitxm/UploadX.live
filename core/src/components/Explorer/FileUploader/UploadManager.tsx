@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Upload,
   ChevronUp,
@@ -9,7 +9,8 @@ import {
   FileIcon,
   Trash2,
   X,
-  Clock
+  Clock,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,10 +18,11 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { FileUpload } from "@/types/file";
 import { useUploadProgress } from "@/hooks/useUploadProgress";
+import { usePathname } from "next/navigation";
 
 interface UploadManagerProps {
   uploads: FileUpload[];
-  onMinimize: () => void;
+  toggleMinimize: (props?: { minimize?: boolean }) => void;
   isMinimized: boolean;
   onOpenFile: (fileId: string) => void;
   onRemoveFile: (fileId: string) => void;
@@ -29,16 +31,24 @@ interface UploadManagerProps {
 
 export function UploadManager({
   uploads,
-  onMinimize,
+  toggleMinimize,
   isMinimized,
   onOpenFile,
   onRemoveFile,
   onClearCompleted
 }: UploadManagerProps) {
+  const pathName = usePathname();
+  const [initialPath] = useState(pathName);
   const activeUploads = uploads.filter((u) => u.status === "uploading");
   const completedUploads = uploads.filter((u) => u.status === "completed");
   const failedUploads = uploads.filter((u) => u.status === "error");
   const totalUploads = uploads.length;
+
+  useEffect(() => {
+    if (pathName !== initialPath) {
+      toggleMinimize({ minimize: true });
+    }
+  }, [initialPath, pathName, toggleMinimize]);
 
   return (
     <div
@@ -54,7 +64,11 @@ export function UploadManager({
         )}
       >
         <div className="flex items-center space-x-2">
-          <Upload className="h-5 w-5" />
+          {activeUploads.length > 0 ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Upload className="h-5 w-5" />
+          )}
           <h3 className="text-sm font-semibold">
             Upload Manager {totalUploads ? `(${totalUploads})` : null}
           </h3>
@@ -73,7 +87,7 @@ export function UploadManager({
           )}
           <Button
             size="icon"
-            onClick={onMinimize}
+            onClick={() => toggleMinimize()}
             aria-label={isMinimized ? "Expand" : "Collapse"}
             className={`${
               isMinimized ? "rotate-180" : ""

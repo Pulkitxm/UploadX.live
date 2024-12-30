@@ -2,15 +2,15 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { SETTINGS_ITEMS } from "@/lib/config";
+import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 
 export default function SettingsPage() {
   const session = useSession();
   if (!session.data?.user)
     return (
-      <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p>loading...</p>
+      <div className="flex h-full w-full items-center justify-center">
+        <Loader2 size={30} className="animate-spin" />
       </div>
     );
 

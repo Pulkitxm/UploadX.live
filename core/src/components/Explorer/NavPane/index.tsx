@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import SearchBar from "@/components/Explorer/NavPane/Searchbar";
 import UploadFileButton from "@/components/Explorer/NavPane/UploadFileButton";

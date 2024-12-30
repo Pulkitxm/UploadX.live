@@ -60,6 +60,24 @@ export async function findUser({
   };
 }
 
+export async function getUserIdOfGoogleUser(email: string): Promise<RES_TYPE> {
+  const user = await db.user.findFirst({
+    where: {
+      email,
+      loginType: "GOOGLE"
+    },
+    select: {
+      id: true
+    }
+  });
+
+  if (!user) {
+    return { status: "error", error: ERROR.USER_NOT_FOUND };
+  }
+
+  return { status: "success", data: user.id };
+}
+
 export async function createUser({
   type,
   user

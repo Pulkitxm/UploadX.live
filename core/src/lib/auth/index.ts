@@ -63,7 +63,11 @@ export class Auth {
 
   async uploadGoogleImage() {
     if (this.mode === AuthMode.GOOGLE && this.imageUrl) {
-      return await uploadProfilePic_FileOrUrl(this.imageUrl);
+      return await uploadProfilePic_FileOrUrl({
+        file: this.imageUrl,
+        type: "googleOnnboarding",
+        email: this.user.email
+      });
     }
   }
 

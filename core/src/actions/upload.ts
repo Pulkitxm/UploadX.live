@@ -6,6 +6,7 @@ import { PROFILE_MAX_FILE_SIZE } from "@/lib/config";
 import { RES_TYPE } from "@/types/global";
 import { uploadFile } from "@/utils/storage";
 import { auth } from "@/auth";
+import { getUserIdOfGoogleUser } from "@/lib/db/user";
 
 export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
   try {
@@ -51,29 +52,53 @@ export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
 }
 
 export async function uploadProfilePic_FileOrUrl(
-  file: File | string
+  props:
+    | {
+        file: File;
+        type: undefined;
+      }
+    | {
+        file: string;
+        type: "googleOnnboarding";
+        email: string;
+      }
 ): Promise<RES_TYPE> {
   const session = await auth();
 
-  if (!session || !session.user) {
+  if (props.type !== "googleOnnboarding" && (!session || !session.user)) {
     return { status: "error", error: ERROR.INVALID_SESSION };
   }
 
-  if (file instanceof File && file.size > PROFILE_MAX_FILE_SIZE) {
+  if (props.file instanceof File && props.file.size > PROFILE_MAX_FILE_SIZE) {
     return { status: "error", error: ERROR.PROFILE_PIC_TOO_LARGE };
   }
 
-  const userId = session.user.id;
+  let userId: string = "";
+
+  if (props.type === "googleOnnboarding") {
+    const res = await getUserIdOfGoogleUser(props.email);
+
+    if (res.status === "error") {
+      return res;
+    } else {
+      userId = res.data;
+    }
+  } else if (session && session.user) {
+    userId = session.user.id;
+  }
+
   let buffer: Buffer<ArrayBufferLike>;
   let contentType: string;
 
-  if (typeof file === "string") {
-    const response = await axios.get(file, { responseType: "arraybuffer" });
+  if (typeof props.file === "string") {
+    const response = await axios.get(props.file, {
+      responseType: "arraybuffer"
+    });
     buffer = Buffer.from(response.data);
     contentType = "image/png";
   } else {
-    buffer = Buffer.from(await file.arrayBuffer());
-    contentType = file.type;
+    buffer = Buffer.from(await props.file.arrayBuffer());
+    contentType = props.file.type;
   }
 
   const res = await uploadFile({

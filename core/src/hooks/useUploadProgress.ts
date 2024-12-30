@@ -15,36 +15,30 @@ export const useUploadProgress = ({
   size: number;
 }) => {
   const [progress, setProgress] = useState(0);
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
     if (status === "uploading") {
       const updateInterval = getRandWait(size);
       const maxProgress = size < 1_000_000 ? 95 : 85;
 
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= maxProgress) return prev;
           return prev + Math.random() * 5;
         });
       }, updateInterval);
-
-      setIntervalId(interval);
     }
 
     if (status === "completed") {
-      if (intervalId) clearInterval(intervalId);
       setProgress(100);
     }
 
-    if (status === "error") {
-      if (intervalId) clearInterval(intervalId);
-    }
-
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      if (interval) clearInterval(interval);
     };
-  }, [status, size, intervalId]);
+  }, [status, size]);
 
   return progress;
 };
