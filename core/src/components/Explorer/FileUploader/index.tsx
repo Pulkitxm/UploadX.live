@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { DragOverlay } from "./DragOverlay";
-import { UploadManager } from "./UploadManager";
-import { showToast } from "../toast";
+import { DragOverlay } from "@/components/Explorer/FileUploader/DragOverlay";
+import { UploadManager } from "@/components/Explorer/FileUploader/UploadManager";
+import { showToast } from "@/components/toast";
 import { upload_FileOrUrl } from "@/actions/upload";
 import { FileUpload } from "@/types/file";
 import { useSession } from "next-auth/react";

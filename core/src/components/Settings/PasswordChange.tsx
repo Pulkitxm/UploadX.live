@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { showToast } from "../toast";
+import { showToast } from "@/components/toast";
 import { ERROR } from "@/types/error";
 import { resetPasswordForUserWithSession } from "@/lib/user";
 

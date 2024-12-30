@@ -1,5 +1,5 @@
 import { AuthMode, EMAIL_USER, GOOGLE_USER } from "@/types/auth";
-import db from "../db";
+import db from "@/lib/db";
 import { ERROR } from "@/types/error";
 import { Prisma } from "@prisma/client";
 import { RES_TYPE } from "@/types/global";
@@ -9,7 +9,7 @@ import {
   VERIFY_CODE_EXPIRY,
   VERIFY_CODE_GAP,
   VERIFY_CODE_RESEND_GAP
-} from "../config";
+} from "@/lib/config";
 
 export async function findUser({
   email,

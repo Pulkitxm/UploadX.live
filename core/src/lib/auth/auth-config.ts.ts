@@ -1,9 +1,9 @@
 import { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "../constants";
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@/lib/constants";
 import { ERROR } from "@/types/error";
-import { findUser } from "../db/user";
+import { findUser } from "@/lib/db/user";
 import { AuthMode, userSchema } from "@/types/auth";
 import { z } from "zod";
 import { comparePassword } from "@/utils/hash";

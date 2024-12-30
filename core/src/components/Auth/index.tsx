@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/card";
 import { AuthGoogle } from "@/components/Auth/AuthWithGoogle";
 import LoginError from "@/components/LoginError";
-import LoginForm from "./LoginForm";
-import RegisterForm from "./RegisterForm";
+import LoginForm from "@/components/Auth/LoginForm";
+import RegisterForm from "@/components/Auth/RegisterForm";
 import { Suspense } from "react";
 
 export default function Auth({ mode }: { mode: "login" | "register" }) {

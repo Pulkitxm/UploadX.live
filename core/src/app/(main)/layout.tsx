@@ -1,6 +1,6 @@
 "use client";
 
-import FileUploader from "@/components/FileUploader";
+import FileUploader from "@/components/Explorer/FileUploader";
 import NotVerified from "@/components/NotVerified";
 import Sidebar from "@/components/Sidebar";
 import { Loader2 } from "lucide-react";

@@ -6,7 +6,7 @@ import {
   USER,
   userSchema
 } from "@/types/auth";
-import { createUser, findUser } from "../db/user";
+import { createUser, findUser } from "@/lib/db/user";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
 import { uploadProfilePic_FileOrUrl } from "@/actions/upload";

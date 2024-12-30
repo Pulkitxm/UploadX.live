@@ -1,5 +1,5 @@
 import { NextAuthProvider } from "@/components/NextAuthProvider";
-import "./globals.css";
+import "@/globals.css";
 import Navbar from "@/components/Navbar";
 import { Toaster } from "sonner";
 

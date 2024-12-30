@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 import { authConfig } from "@/lib/auth/auth-config.ts";
 import { API_AUTH_PREFIX, AUTH_ROUTES, PROTECTED_ROUTES } from "@/routes";
-import { ERROR } from "./types/error";
+import { ERROR } from "@/types/error";
 
 export const { auth } = NextAuth(authConfig);
 

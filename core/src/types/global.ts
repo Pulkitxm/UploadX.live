@@ -1,4 +1,4 @@
-import { ERROR } from "./error";
+import { ERROR } from "@/types/error";
 
 export type RES_TYPE =
   | {
