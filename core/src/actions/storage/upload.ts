@@ -2,11 +2,11 @@
 
 import axios from "axios";
 import { ERROR } from "@/types/error";
-import { PROFILE_MAX_FILE_SIZE } from "@/lib/config";
+import { PROFILE_MAX_FILE_SIZE } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
-import { uploadFile } from "@/utils/storage";
+import { uploadFile } from "@/actions/storage/utils";
 import { auth } from "@/auth";
-import { getUserIdOfGoogleUser } from "@/lib/db/user";
+import { getUserIdOfGoogleUser } from "@/prisma/db/user";
 
 export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
   try {
@@ -55,7 +55,7 @@ export async function uploadProfilePic_FileOrUrl(
   props:
     | {
         file: File;
-        type: undefined;
+        type?: undefined;
       }
     | {
         file: string;
@@ -65,11 +65,25 @@ export async function uploadProfilePic_FileOrUrl(
 ): Promise<RES_TYPE> {
   const session = await auth();
 
+  if (props.type !== "googleOnnboarding") {
+    const fileSize = props.file.size;
+
+    if (fileSize > PROFILE_MAX_FILE_SIZE) {
+      return { status: "error", error: ERROR.PROFILE_PIC_TOO_LARGE };
+    }
+  }
+
   if (props.type !== "googleOnnboarding" && (!session || !session.user)) {
     return { status: "error", error: ERROR.INVALID_SESSION };
   }
 
   if (props.file instanceof File && props.file.size > PROFILE_MAX_FILE_SIZE) {
+    console.log({
+      size: props.file.size,
+      max: PROFILE_MAX_FILE_SIZE,
+      err: ERROR.PROFILE_PIC_TOO_LARGE
+    });
+
     return { status: "error", error: ERROR.PROFILE_PIC_TOO_LARGE };
   }
 

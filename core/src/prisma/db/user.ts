@@ -1,5 +1,5 @@
 import { AuthMode, EMAIL_USER, GOOGLE_USER } from "@/types/auth";
-import db from "@/lib/db";
+import db from "@/prisma/db";
 import { ERROR } from "@/types/error";
 import { Prisma } from "@prisma/client";
 import { RES_TYPE } from "@/types/global";

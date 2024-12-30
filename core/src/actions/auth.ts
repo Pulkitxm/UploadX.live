@@ -1,6 +1,6 @@
 "use server";
 
-import { createUser, findUser } from "@/lib/db/user";
+import { createUser, findUser } from "@/prisma/db/user";
 import { AuthMode } from "@/types/auth";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";

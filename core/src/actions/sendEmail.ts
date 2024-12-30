@@ -2,7 +2,7 @@
 
 import VerifyEmail from "@/components/VerifyUser/verify-email";
 import { NEXTAUTH_URL, RESEND_API_KEY } from "@/lib/constants";
-import { setVerifyCode } from "@/lib/db/user";
+import { setVerifyCode } from "@/prisma/db/user";
 import { genVerifyCode } from "@/lib/utils";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";

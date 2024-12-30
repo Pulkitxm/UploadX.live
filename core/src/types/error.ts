@@ -1,12 +1,7 @@
 /* eslint-disable no-unused-vars */
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024;
-export const PROFILE_MAX_FILE_SIZE = 1 * 1024 * 1024;
-export const VERIFY_CODE_EXPIRY = 5 * 60 * 1000;
-export const MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT = 5;
-export const MAX_VERIFICATION_ATTEMPTS_LIMIT = 10;
-export const VERIFY_CODE_RESEND_GAP = 10 * 1000;
-export const VERIFY_CODE_GAP = 5 * 1000;
+export const PROFILE_MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export enum ERROR {
   USER_NOT_FOUND = "The specified user could not be found in the system. Please ensure you have entered the correct information and try again",

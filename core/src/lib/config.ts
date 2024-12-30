@@ -12,8 +12,6 @@ import UserInfo from "@/components/Settings/UserInfo";
 import LoginMethods from "@/components/Settings/LoginMethods";
 import { SECRET } from "@/lib/constants";
 
-export const MAX_FILE_SIZE = 10 * 1024 * 1024;
-export const PROFILE_MAX_FILE_SIZE = 1 * 1024 * 1024;
 export const MAX_STORAGE_SIZE = 500 * 1024 * 1024;
 
 export const VERIFY_CODE_EXPIRY = 5 * 60 * 1000;

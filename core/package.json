@@ -16,7 +16,8 @@
     "serve:clean": "pnpm build:clean && pnpm start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,mdx,css,yaml,yml}\"",
-    "check": "prettier --check \"**/*.{ts,tsx,js,jsx,md,mdx,css,yaml,yml}\""
+    "check": "prettier --check \"**/*.{ts,tsx,js,jsx,md,mdx,css,yaml,yml}\"",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.26.0",

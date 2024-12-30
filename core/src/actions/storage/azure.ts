@@ -1,5 +1,7 @@
+"use server";
+
 import { BlobServiceClient } from "@azure/storage-blob";
-import { CONNECTION_STRING, FILE_CONTAINER_NAME } from "../constants";
+import { CONNECTION_STRING, FILE_CONTAINER_NAME } from "../../lib/constants";
 
 export async function getDirectorySize(directoryPath: string) {
   const blobServiceClient =

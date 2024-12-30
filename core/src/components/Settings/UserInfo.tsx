@@ -1,6 +1,6 @@
 "use client";
 
-import { uploadProfilePic_FileOrUrl } from "@/actions/upload";
+import { uploadProfilePic_FileOrUrl } from "@/actions/storage/upload";
 import { useState, useRef, useEffect } from "react";
 import { User, Mail, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,7 @@ export default function UserInfo() {
       if (!file)
         return showToast({ message: "No file selected", type: "error" });
 
-      const result = await uploadProfilePic_FileOrUrl(file);
+      const result = await uploadProfilePic_FileOrUrl({ file });
 
       if (result.status === "success") {
         setAvatar((prev) => {

@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import FileUploader from "@/components/Explorer/FileUploader";
 import NotVerified from "@/components/NotVerified";
 import Sidebar from "@/components/Sidebar";
-import Providers from "@/providers";
+import Providers from "@/state/providers";
 
 export default async function MainAppLayout({
   children

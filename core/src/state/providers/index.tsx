@@ -5,7 +5,7 @@ import { Session } from "next-auth";
 import {
   UploadManagerMinimizeProvider,
   UploadsProvider
-} from "@/providers/uploadsProvider";
+} from "@/state/providers/uploadsProvider";
 
 export default function Providers({
   children,

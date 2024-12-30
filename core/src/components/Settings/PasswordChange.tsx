@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { showToast } from "@/components/toast";
 import { ERROR } from "@/types/error";
-import { resetPasswordForUserWithSession } from "@/lib/user";
+import { resetPasswordForUserWithSession } from "@/actions/user";
 
 export default function PasswordChange() {
   const [config, setConfig] = useState({

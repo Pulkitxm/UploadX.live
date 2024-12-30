@@ -10,10 +10,10 @@ import React, {
 import { DragOverlay } from "@/components/Explorer/FileUploader/DragOverlay";
 import { UploadManager } from "@/components/Explorer/FileUploader/UploadManager";
 import { showToast } from "@/components/toast";
-import { upload_FileOrUrl } from "@/actions/upload";
+import { upload_FileOrUrl } from "@/actions/storage/upload";
 import { FileUpload } from "@/types/file";
 import { useSession } from "next-auth/react";
-import { UploadManagerMinimize, UploadsContext } from "@/context/upload";
+import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
 
 export default function FileUploader() {
   const { status } = useSession();

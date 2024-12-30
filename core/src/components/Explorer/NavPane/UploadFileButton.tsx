@@ -1,6 +1,6 @@
-import { upload_FileOrUrl } from "@/actions/upload";
+import { upload_FileOrUrl } from "@/actions/storage/upload";
 import { showToast } from "@/components/toast";
-import { UploadManagerMinimize, UploadsContext } from "@/context/upload";
+import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
 import { FileUpload } from "@/types/file";
 import { UploadIcon } from "lucide-react";
 import { useSession } from "next-auth/react";

@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 
-import { authConfig } from "@/lib/auth/auth-config.ts";
+import { authConfig } from "@/lib/auth/auth-config";
 import { API_AUTH_PREFIX, AUTH_ROUTES, PROTECTED_ROUTES } from "@/routes";
 import { ERROR } from "@/types/error";
 

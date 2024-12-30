@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, ReactNode, useCallback } from "react";
+import React, { useState, ReactNode, useCallback, useEffect } from "react";
 import { FileUpload } from "@/types/file";
-import { getFiles, setFiles } from "@/lib/file/util";
-import { UploadManagerMinimize, UploadsContext } from "@/context/upload";
+import { getFiles, setFiles } from "@/lib/utils";
+import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
 
 export const UploadsProvider: React.FC<{ children: ReactNode }> = ({
   children
@@ -36,9 +36,7 @@ export const UploadsProvider: React.FC<{ children: ReactNode }> = ({
 export const UploadManagerMinimizeProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [isMinimized, setIsMinimized] = useState(
-    localStorage.getItem("uploadManagerMinimize") === "true"
-  );
+  const [isMinimized, setIsMinimized] = useState(false);
 
   const toggleMinimize = useCallback((props?: { minimize?: boolean }) => {
     setIsMinimized((prev) => {
@@ -49,6 +47,11 @@ export const UploadManagerMinimizeProvider: React.FC<{
       );
       return newValue;
     });
+  }, []);
+
+  useEffect(() => {
+    const value = localStorage.getItem("uploadManagerMinimize");
+    setIsMinimized(value === "true");
   }, []);
 
   return (

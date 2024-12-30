@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { verifyUser } from "@/lib/db/user";
+import { verifyUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
 import { NextRequest, NextResponse } from "next/server";
 

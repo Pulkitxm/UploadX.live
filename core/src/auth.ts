@@ -1,9 +1,9 @@
 import NextAuth from "next-auth";
-import { authConfig } from "@/lib/auth/auth-config.ts";
+import { authConfig } from "@/lib/auth/auth-config";
 import { AuthMode, userLoginSchema } from "@/types/auth";
 import { Auth } from "@/lib/auth";
 import { ERROR } from "@/types/error";
-import { getUserSessionData } from "@/lib/db/user";
+import { getUserSessionData } from "@/prisma/db/user";
 import { ASSETS_SERVR_BASE_URL, SECRET } from "@/lib/constants";
 import { getToken } from "@/lib/config";
 
