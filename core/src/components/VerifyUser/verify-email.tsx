@@ -1,24 +1,11 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Html,
-  Preview,
-  Section,
-  Text
-} from "@react-email/components";
+import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from "@react-email/components";
 
 interface VerifyEmailProps {
   verificationCode: string;
   verificationUrl: string;
 }
 
-export default function VerifyEmail({
-  verificationCode,
-  verificationUrl
-}: VerifyEmailProps) {
+export default function VerifyEmail({ verificationCode, verificationUrl }: VerifyEmailProps) {
   return (
     <Html>
       <Head />
@@ -27,10 +14,7 @@ export default function VerifyEmail({
         <Container style={container}>
           <Heading style={h1}>Verify Your UploadX Account</Heading>
 
-          <Text style={text}>
-            Use the verification code below or click the button to verify your
-            account:
-          </Text>
+          <Text style={text}>Use the verification code below or click the button to verify your account:</Text>
 
           <Section style={codeContainer}>
             <Text style={code}>{verificationCode}</Text>
@@ -51,10 +35,7 @@ export default function VerifyEmail({
             </Button>
           </Section>
 
-          <Text style={footer}>
-            If you didn&apos;t request this verification, please ignore this
-            email.
-          </Text>
+          <Text style={footer}>If you didn&apos;t request this verification, please ignore this email.</Text>
         </Container>
       </Body>
     </Html>
@@ -77,8 +58,7 @@ const container = {
 
 const h1 = {
   color: "#1a1a1a",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "24px",
   fontWeight: "600",
   lineHeight: "40px",
@@ -88,8 +68,7 @@ const h1 = {
 
 const text = {
   color: "#444",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "15px",
   lineHeight: "24px",
   textAlign: "center"
@@ -123,8 +102,7 @@ const button = {
   backgroundColor: "#4f46e5",
   borderRadius: "4px",
   color: "#fff",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "14px",
   fontWeight: "600",
   lineHeight: "1",
@@ -137,8 +115,7 @@ const button = {
 
 const footer = {
   color: "#666",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
   fontSize: "13px",
   lineHeight: "20px",
   textAlign: "center",

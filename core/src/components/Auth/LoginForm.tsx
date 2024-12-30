@@ -1,9 +1,10 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -51,13 +52,7 @@ export default function LoginForm() {
     >
       <div className="space-y-4">
         {field.map((f, i) => (
-          <Input
-            key={i}
-            name={f.name}
-            type={f.type}
-            placeholder={f.placeholder}
-            required={f.required}
-          />
+          <Input key={i} name={f.name} type={f.type} placeholder={f.placeholder} required={f.required} />
         ))}
         <Button className="w-full" loading={loading}>
           Login

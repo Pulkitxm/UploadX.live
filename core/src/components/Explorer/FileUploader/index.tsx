@@ -1,19 +1,14 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useContext
-} from "react";
+import { useSession } from "next-auth/react";
+import React, { useState, useEffect, useCallback, useRef, useContext } from "react";
+
+import { upload_FileOrUrl } from "@/actions/storage/upload";
 import { DragOverlay } from "@/components/Explorer/FileUploader/DragOverlay";
 import { UploadManager } from "@/components/Explorer/FileUploader/UploadManager";
 import { showToast } from "@/components/toast";
-import { upload_FileOrUrl } from "@/actions/storage/upload";
-import { FileUpload } from "@/types/file";
-import { useSession } from "next-auth/react";
 import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
+import { FileUpload } from "@/types/file";
 
 export default function FileUploader() {
   const { status } = useSession();
@@ -83,7 +78,10 @@ export default function FileUploader() {
               updateUploads((prevUploads) =>
                 prevUploads.map((upload) =>
                   upload.id === newUpload.id
-                    ? { ...upload, status: "error" }
+                    ? {
+                        ...upload,
+                        status: "error"
+                      }
                     : upload
                 )
               );
@@ -110,9 +108,7 @@ export default function FileUploader() {
 
   const handleRemoveFile = useCallback(
     (fileId: string) => {
-      updateUploads((prevUploads) =>
-        prevUploads.filter((upload) => upload.id !== fileId)
-      );
+      updateUploads((prevUploads) => prevUploads.filter((upload) => upload.id !== fileId));
     },
     [updateUploads]
   );
@@ -123,40 +119,16 @@ export default function FileUploader() {
 
   useEffect(() => {
     const bodyElement = document.body;
-    bodyElement.addEventListener(
-      "dragenter",
-      handleDragIn as unknown as EventListener
-    );
-    bodyElement.addEventListener(
-      "dragleave",
-      handleDragOut as unknown as EventListener
-    );
-    bodyElement.addEventListener(
-      "dragover",
-      handleDrag as unknown as EventListener
-    );
-    bodyElement.addEventListener(
-      "drop",
-      handleDrop as unknown as EventListener
-    );
+    bodyElement.addEventListener("dragenter", handleDragIn as unknown as EventListener);
+    bodyElement.addEventListener("dragleave", handleDragOut as unknown as EventListener);
+    bodyElement.addEventListener("dragover", handleDrag as unknown as EventListener);
+    bodyElement.addEventListener("drop", handleDrop as unknown as EventListener);
 
     return () => {
-      bodyElement.removeEventListener(
-        "dragenter",
-        handleDragIn as unknown as EventListener
-      );
-      bodyElement.removeEventListener(
-        "dragleave",
-        handleDragOut as unknown as EventListener
-      );
-      bodyElement.removeEventListener(
-        "dragover",
-        handleDrag as unknown as EventListener
-      );
-      bodyElement.removeEventListener(
-        "drop",
-        handleDrop as unknown as EventListener
-      );
+      bodyElement.removeEventListener("dragenter", handleDragIn as unknown as EventListener);
+      bodyElement.removeEventListener("dragleave", handleDragOut as unknown as EventListener);
+      bodyElement.removeEventListener("dragover", handleDrag as unknown as EventListener);
+      bodyElement.removeEventListener("drop", handleDrop as unknown as EventListener);
     };
   }, [handleDrag, handleDragIn, handleDragOut, handleDrop]);
 

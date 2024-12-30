@@ -15,24 +15,42 @@ export async function signUp({
   email: string;
 }): Promise<RES_TYPE> {
   try {
-    const existingUser = await findUser({ mode: AuthMode.EMAIL, email });
+    const existingUser = await findUser({
+      mode: AuthMode.EMAIL,
+      email
+    });
     if (existingUser.status === "success") {
-      return { status: "error", error: ERROR.EMAIL_EXISTS };
+      return {
+        status: "error",
+        error: ERROR.EMAIL_EXISTS
+      };
     }
 
     const newUser = await createUser({
       type: AuthMode.EMAIL,
-      user: { email, name, password }
+      user: {
+        email,
+        name,
+        password
+      }
     });
 
     if (newUser.status === "error") {
-      return { status: "error", error: newUser.error };
+      return {
+        status: "error",
+        error: newUser.error
+      };
     }
 
-    return { status: "success" };
+    return {
+      status: "success"
+    };
   } catch (error) {
     console.log(error);
 
-    return { status: "error", error: ERROR.UNEXPECTED };
+    return {
+      status: "error",
+      error: ERROR.UNEXPECTED
+    };
   }
 }

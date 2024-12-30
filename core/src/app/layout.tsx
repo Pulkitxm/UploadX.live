@@ -1,7 +1,8 @@
-import { NextAuthProvider } from "@/components/NextAuthProvider";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 import { Toaster } from "sonner";
+
+import Navbar from "@/components/Navbar";
+import { NextAuthProvider } from "@/components/NextAuthProvider";
 
 export default function RootLayout({
   children

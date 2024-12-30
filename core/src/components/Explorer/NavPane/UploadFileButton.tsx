@@ -1,10 +1,12 @@
-import { upload_FileOrUrl } from "@/actions/storage/upload";
-import { showToast } from "@/components/toast";
-import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
-import { FileUpload } from "@/types/file";
 import { UploadIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useContext, useRef } from "react";
+
+import { upload_FileOrUrl } from "@/actions/storage/upload";
+import { showToast } from "@/components/toast";
+import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
+import { ERROR } from "@/types/error";
+import { FileUpload } from "@/types/file";
 
 export default function UploadFileButton() {
   const session = useSession();
@@ -15,16 +17,17 @@ export default function UploadFileButton() {
 
   function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
-    console.log(files);
 
     if (!files || files.length === 0) {
       return showToast({
         type: "error",
-        message: "No files selected"
+        message: ERROR.NO_FILE_SELECTED
       });
     }
 
-    toggleMinimize({ minimize: false });
+    toggleMinimize({
+      minimize: false
+    });
     Array.from(files).forEach((file) => {
       const newUpload: FileUpload = {
         id: Math.random().toString(36).substr(2, 9),
@@ -38,6 +41,8 @@ export default function UploadFileButton() {
 
       upload_FileOrUrl(file)
         .then((res) => {
+          console.log(res);
+
           updateUploads((prevUploads) =>
             prevUploads.map((upload) =>
               upload.id === newUpload.id
@@ -48,15 +53,33 @@ export default function UploadFileButton() {
                 : upload
             )
           );
+          showToast(
+            res.status === "success"
+              ? {
+                  type: "success",
+                  message: "File uploaded successfully"
+                }
+              : {
+                  type: "error",
+                  message: res.error
+                }
+          );
         })
         .catch(() => {
           updateUploads((prevUploads) =>
             prevUploads.map((upload) =>
               upload.id === newUpload.id
-                ? { ...upload, status: "error" }
+                ? {
+                    ...upload,
+                    status: "error"
+                  }
                 : upload
             )
           );
+          showToast({
+            type: "error",
+            message: ERROR.UPLOAD_FAILED
+          });
         });
     });
   }
@@ -74,15 +97,7 @@ export default function UploadFileButton() {
         Upload
         <UploadIcon className="size-4 text-gray-500" />
       </button>
-      <input
-        type="file"
-        className="hidden"
-        multiple
-        ref={inputRef}
-        onChange={handleFileInput}
-        required
-        min={1}
-      />
+      <input type="file" className="hidden" multiple ref={inputRef} onChange={handleFileInput} required min={1} />
     </div>
   );
 }

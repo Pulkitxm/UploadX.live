@@ -1,22 +1,17 @@
 "use client";
 
-import { uploadProfilePic_FileOrUrl } from "@/actions/storage/upload";
-import { useState, useRef, useEffect } from "react";
 import { User, Mail, Camera } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useState, useRef, useEffect } from "react";
+
+import { uploadProfilePic_FileOrUrl } from "@/actions/storage/upload";
+import { editUser } from "@/actions/user";
+import { showToast } from "@/components/toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import { useSession } from "next-auth/react";
-import { showToast } from "@/components/toast";
-import { editUser } from "@/actions/user";
 import { ERROR } from "@/types/error";
 
 export default function UserInfo() {
@@ -35,9 +30,14 @@ export default function UserInfo() {
     try {
       const file = e.target.files?.[0];
       if (!file)
-        return showToast({ message: "No file selected", type: "error" });
+        return showToast({
+          message: ERROR.NO_FILE_SELECTED,
+          type: "error"
+        });
 
-      const result = await uploadProfilePic_FileOrUrl({ file });
+      const result = await uploadProfilePic_FileOrUrl({
+        file
+      });
 
       if (result.status === "success") {
         setAvatar((prev) => {
@@ -49,16 +49,25 @@ export default function UserInfo() {
           }
           return prev;
         });
-        showToast({ message: "Image uploaded successfully", type: "success" });
+        showToast({
+          message: "Image uploaded successfully",
+          type: "success"
+        });
       } else if (result.status === "error") {
-        showToast({ type: "error", message: result.error });
+        showToast({
+          type: "error",
+          message: result.error
+        });
         setLoading(false);
         // clear the input
         fileInputRef.current!.value = "";
       }
     } catch (error) {
       if (error) {
-        showToast({ message: "Failed to upload image", type: "error" });
+        showToast({
+          message: ERROR.UPLOAD_FAILED,
+          type: "error"
+        });
       }
     } finally {
       setLoading(false);
@@ -68,7 +77,10 @@ export default function UserInfo() {
     if (!session.data?.user?.id) return;
 
     if (name === session.data?.user?.name) {
-      return showToast({ message: ERROR.NO_CHANGES, type: "error" });
+      return showToast({
+        message: ERROR.NO_CHANGE,
+        type: "error"
+      });
     }
 
     try {
@@ -78,13 +90,22 @@ export default function UserInfo() {
 
       if (response.status === "success") {
         await session.update();
-        showToast({ message: "Profile updated successfully", type: "success" });
+        showToast({
+          message: "Profile updated successfully",
+          type: "success"
+        });
       } else {
-        showToast({ message: "Failed to update profile", type: "error" });
+        showToast({
+          message: ERROR.UPDATE_FAILED,
+          type: "error"
+        });
       }
     } catch (error) {
       if (error) {
-        showToast({ message: "Failed to update profile", type: "error" });
+        showToast({
+          message: ERROR.UPDATE_FAILED,
+          type: "error"
+        });
       }
     }
   };
@@ -104,9 +125,7 @@ export default function UserInfo() {
           <label className="cursor-pointer">
             <Avatar className="h-20 w-20">
               <AvatarImage src={avatar} alt="User avatar" />
-              <AvatarFallback>
-                {session.data?.user?.name?.[0] || "U"}
-              </AvatarFallback>
+              <AvatarFallback>{session.data?.user?.name?.[0] || "U"}</AvatarFallback>
             </Avatar>
             <input
               type="file"
@@ -117,12 +136,7 @@ export default function UserInfo() {
               multiple={false}
             />
           </label>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading}
-          >
+          <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={loading}>
             {loading ? (
               <span>Uploading...</span>
             ) : (
@@ -138,12 +152,7 @@ export default function UserInfo() {
           <Label htmlFor="name">Name</Label>
           <div className="relative">
             <User className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="pl-8"
-            />
+            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="pl-8" />
           </div>
         </div>
 
@@ -151,13 +160,7 @@ export default function UserInfo() {
           <Label htmlFor="email">Email</Label>
           <div className="relative">
             <Mail className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-            <Input
-              id="email"
-              type="email"
-              value={session.data?.user?.email || ""}
-              className="pl-8"
-              readOnly
-            />
+            <Input id="email" type="email" value={session.data?.user?.email || ""} className="pl-8" readOnly />
           </div>
         </div>
 

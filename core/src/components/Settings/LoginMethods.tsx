@@ -1,18 +1,12 @@
 "use client";
 
+import { useSession } from "next-auth/react";
 import React, { Fragment } from "react";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useSession } from "next-auth/react";
-import { AuthMode } from "@/types/auth";
 import { LOGIN_METHODS } from "@/lib/config";
+import { AuthMode } from "@/types/auth";
 
 export default function LoginMethods() {
   const session = useSession();

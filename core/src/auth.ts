@@ -1,11 +1,12 @@
 import NextAuth from "next-auth";
-import { authConfig } from "@/lib/auth/auth-config";
-import { AuthMode, userLoginSchema } from "@/types/auth";
+
 import { Auth } from "@/lib/auth";
-import { ERROR } from "@/types/error";
-import { getUserSessionData } from "@/prisma/db/user";
-import { ASSETS_SERVR_BASE_URL, SECRET } from "@/lib/constants";
+import { authConfig } from "@/lib/auth/auth-config";
 import { getToken } from "@/lib/config";
+import { ASSETS_SERVR_BASE_URL, SECRET } from "@/lib/constants";
+import { getUserSessionData } from "@/prisma/db/user";
+import { AuthMode, userLoginSchema } from "@/types/auth";
+import { ERROR } from "@/types/error";
 
 export const { handlers, signIn, auth, signOut } = NextAuth({
   ...authConfig,
@@ -21,12 +22,8 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
         return "/login?error=" + ERROR.INVALID_LOGIN;
       }
 
-      if (
-        account?.provider === "google" ||
-        account?.provider === "credentials"
-      ) {
-        const mode =
-          account.provider === "google" ? AuthMode.GOOGLE : AuthMode.EMAIL;
+      if (account?.provider === "google" || account?.provider === "credentials") {
+        const mode = account.provider === "google" ? AuthMode.GOOGLE : AuthMode.EMAIL;
         let newUser: Auth;
 
         if (mode === AuthMode.GOOGLE) {
@@ -72,17 +69,14 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
         token.email = user.email;
         token.name = user.name;
         token.isVerified = user.isVerified || false;
-        token.loginType =
-          account?.provider === "google" ? AuthMode.GOOGLE : AuthMode.EMAIL;
+        token.loginType = account?.provider === "google" ? AuthMode.GOOGLE : AuthMode.EMAIL;
       }
       return token;
     },
 
     async session({ session, token, trigger }) {
       try {
-        const { id, isVerified, loginType, name } = await getUserSessionData(
-          token.email!
-        );
+        const { id, isVerified, loginType, name } = await getUserSessionData(token.email!);
 
         if (!id) {
           throw new Error(ERROR.USER_NOT_FOUND);
@@ -108,8 +102,7 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
             loginType,
             email: token.email,
             name,
-            image:
-              ASSETS_SERVR_BASE_URL + "/" + id + "?t=" + new Date().getTime(),
+            image: ASSETS_SERVR_BASE_URL + "/" + id + "?t=" + new Date().getTime(),
             img_token
           }
         };

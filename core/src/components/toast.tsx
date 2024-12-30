@@ -1,14 +1,19 @@
 "use client";
 
-import { toast } from "sonner";
 import { AlertCircle, CheckCircle, Loader2, XCircle } from "lucide-react";
+import { toast } from "sonner";
 
-type ToastType = "success" | "error" | "warning" | "loading";
+import { ERROR } from "@/types/error";
 
-interface ToastProps {
-  message: string;
-  type: ToastType;
-}
+type ToastProps =
+  | {
+      message: string;
+      type: "success" | "warning" | "loading";
+    }
+  | {
+      type: "error";
+      message: ERROR;
+    };
 
 const icons = {
   success: <CheckCircle className="h-6 w-6 text-emerald-600" />,

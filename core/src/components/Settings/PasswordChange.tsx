@@ -1,20 +1,15 @@
 "use client";
 
-import React, { FormEvent, useState } from "react";
 import { Lock } from "lucide-react";
+import React, { FormEvent, useState } from "react";
+
+import { resetPasswordForUserWithSession } from "@/actions/user";
+import { showToast } from "@/components/toast";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import { showToast } from "@/components/toast";
 import { ERROR } from "@/types/error";
-import { resetPasswordForUserWithSession } from "@/actions/user";
 
 export default function PasswordChange() {
   const [config, setConfig] = useState({
@@ -48,7 +43,11 @@ export default function PasswordChange() {
         type: "success",
         message: "Password updated successfully"
       });
-      setConfig({ password: "", newPassword: "", confirmNewPassword: "" });
+      setConfig({
+        password: "",
+        newPassword: "",
+        confirmNewPassword: ""
+      });
     }
   }
 
@@ -59,7 +58,10 @@ export default function PasswordChange() {
       type: "password",
       value: config.password,
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setConfig({ ...config, password: e.target.value })
+        setConfig({
+          ...config,
+          password: e.target.value
+        })
     },
     {
       label: "New Password",
@@ -67,7 +69,10 @@ export default function PasswordChange() {
       type: "password",
       value: config.newPassword,
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setConfig({ ...config, newPassword: e.target.value })
+        setConfig({
+          ...config,
+          newPassword: e.target.value
+        })
     },
     {
       label: "Confirm New Password",
@@ -75,7 +80,10 @@ export default function PasswordChange() {
       type: "password",
       value: config.confirmNewPassword,
       onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
-        setConfig({ ...config, confirmNewPassword: e.target.value })
+        setConfig({
+          ...config,
+          confirmNewPassword: e.target.value
+        })
     }
   ];
 

@@ -1,16 +1,11 @@
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { Suspense } from "react";
+
 import { AuthGoogle } from "@/components/Auth/AuthWithGoogle";
-import LoginError from "@/components/LoginError";
 import LoginForm from "@/components/Auth/LoginForm";
 import RegisterForm from "@/components/Auth/RegisterForm";
-import { Suspense } from "react";
+import LoginError from "@/components/LoginError";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Auth({ mode }: { mode: "login" | "register" }) {
   return (
@@ -42,10 +37,7 @@ export default function Auth({ mode }: { mode: "login" | "register" }) {
           <CardFooter className="justify-center">
             <p>
               Don&apos;t have an account?{" "}
-              <Link
-                href={mode === "login" ? "/register" : "/login"}
-                className="text-blue-600 hover:underline"
-              >
+              <Link href={mode === "login" ? "/register" : "/login"} className="text-blue-600 hover:underline">
                 {mode === "login" ? "Register" : "Login"}
               </Link>
             </p>

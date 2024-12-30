@@ -1,11 +1,12 @@
 import { NextAuthConfig } from "next-auth";
-import Google from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
+import { z } from "zod";
+
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "@/lib/constants";
-import { ERROR } from "@/types/error";
 import { findUser } from "@/prisma/db/user";
 import { AuthMode, userSchema } from "@/types/auth";
-import { z } from "zod";
+import { ERROR } from "@/types/error";
 import { comparePassword } from "@/utils/hash";
 
 export const authConfig: NextAuthConfig = {
@@ -17,8 +18,14 @@ export const authConfig: NextAuthConfig = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        email: {
+          label: "Email",
+          type: "email"
+        },
+        password: {
+          label: "Password",
+          type: "password"
+        }
       },
       async authorize(cred) {
         const crdSchema = z.object({
@@ -62,10 +69,7 @@ export const authConfig: NextAuthConfig = {
           throw new Error(ERROR.USER_EXISTS_BUT_WITH_GOOGLE_LOGIN);
         }
 
-        const isValid = await comparePassword(
-          credentials.password,
-          user.password
-        );
+        const isValid = await comparePassword(credentials.password, user.password);
 
         if (!isValid) {
           throw new Error(ERROR.INVALID_CREDENTIALS);

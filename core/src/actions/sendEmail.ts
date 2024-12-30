@@ -1,22 +1,17 @@
 "use server";
 
+import { Resend } from "resend";
+
 import VerifyEmail from "@/components/VerifyUser/verify-email";
 import { NEXTAUTH_URL, RESEND_API_KEY } from "@/lib/constants";
-import { setVerifyCode } from "@/prisma/db/user";
 import { genVerifyCode } from "@/lib/utils";
+import { setVerifyCode } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
-import { Resend } from "resend";
 
 const resend = new Resend(RESEND_API_KEY);
 
-export async function sendVerificationEmail({
-  email,
-  userId
-}: {
-  userId?: string;
-  email: string;
-}): Promise<RES_TYPE> {
+export async function sendVerificationEmail({ email, userId }: { userId?: string; email: string }): Promise<RES_TYPE> {
   try {
     const code = genVerifyCode();
     const verifyUrl = `${NEXTAUTH_URL}/api/verify?code=${code}`;
@@ -45,7 +40,10 @@ export async function sendVerificationEmail({
     if (res.error) {
       console.log("sendVerificationEmail error:", res.error);
 
-      return { status: "error", error: ERROR.EMAIL_SEND_ERROR };
+      return {
+        status: "error",
+        error: ERROR.EMAIL_SEND_ERROR
+      };
     }
 
     return {
@@ -57,6 +55,9 @@ export async function sendVerificationEmail({
     };
   } catch (error) {
     console.error("sendVerificationEmail error:", error);
-    return { status: "error", error: ERROR.EMAIL_SEND_ERROR };
+    return {
+      status: "error",
+      error: ERROR.EMAIL_SEND_ERROR
+    };
   }
 }

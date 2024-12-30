@@ -1,24 +1,15 @@
 "use client";
 
+import { Upload, ChevronUp, CheckCircle, AlertCircle, FileIcon, Trash2, X, Clock, Loader2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import {
-  Upload,
-  ChevronUp,
-  CheckCircle,
-  AlertCircle,
-  FileIcon,
-  Trash2,
-  X,
-  Clock,
-  Loader2
-} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useUploadProgress } from "@/hooks/useUploadProgress";
 import { cn } from "@/lib/utils";
 import { FileUpload } from "@/types/file";
-import { useUploadProgress } from "@/hooks/useUploadProgress";
-import { usePathname } from "next/navigation";
 
 interface UploadManagerProps {
   uploads: FileUpload[];
@@ -46,7 +37,9 @@ export function UploadManager({
 
   useEffect(() => {
     if (pathName !== initialPath) {
-      toggleMinimize({ minimize: true });
+      toggleMinimize({
+        minimize: true
+      });
     }
   }, [initialPath, pathName, toggleMinimize]);
 
@@ -64,14 +57,8 @@ export function UploadManager({
         )}
       >
         <div className="flex items-center space-x-2">
-          {activeUploads.length > 0 ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <Upload className="h-5 w-5" />
-          )}
-          <h3 className="text-sm font-semibold">
-            Upload Manager {totalUploads ? `(${totalUploads})` : null}
-          </h3>
+          {activeUploads.length > 0 ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
+          <h3 className="text-sm font-semibold">Upload Manager {totalUploads ? `(${totalUploads})` : null}</h3>
         </div>
         <div className="flex items-center space-x-2">
           {completedUploads.length > 0 && (
@@ -89,9 +76,7 @@ export function UploadManager({
             size="icon"
             onClick={() => toggleMinimize()}
             aria-label={isMinimized ? "Expand" : "Collapse"}
-            className={`${
-              isMinimized ? "rotate-180" : ""
-            } transform transition-transform duration-300 ease-in-out`}
+            className={`${isMinimized ? "rotate-180" : ""} transform transition-transform duration-300 ease-in-out`}
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
@@ -100,18 +85,14 @@ export function UploadManager({
       {!isMinimized && (
         <ScrollArea className="h-[calc(100%-3.5rem)] bg-gray-50 p-2 md:p-4">
           {uploads.length === 0 ? (
-            <p className="flex h-full items-center justify-center text-center text-gray-500">
-              No uploads
-            </p>
+            <p className="flex h-full items-center justify-center text-center text-gray-500">No uploads</p>
           ) : (
             <div className="space-y-6">
               {activeUploads.length > 0 && (
                 <UploadSection
                   title="Uploading"
                   uploads={activeUploads}
-                  renderItem={(upload) => (
-                    <DownloadItem key={upload.id} upload={upload} />
-                  )}
+                  renderItem={(upload) => <DownloadItem key={upload.id} upload={upload} />}
                 />
               )}
               {completedUploads.length > 0 && (
@@ -132,13 +113,7 @@ export function UploadManager({
                 <UploadSection
                   title="Failed"
                   uploads={failedUploads}
-                  renderItem={(upload) => (
-                    <FailedItem
-                      key={upload.id}
-                      upload={upload}
-                      onRemoveFile={onRemoveFile}
-                    />
-                  )}
+                  renderItem={(upload) => <FailedItem key={upload.id} upload={upload} onRemoveFile={onRemoveFile} />}
                 />
               )}
             </div>
@@ -169,19 +144,15 @@ function UploadSection({
   );
 }
 
-function DownloadItem({
-  upload: { id, name, size, status }
-}: {
-  upload: FileUpload;
-}) {
-  const progress = useUploadProgress({ status, size });
+function DownloadItem({ upload: { id, name, size, status } }: { upload: FileUpload }) {
+  const progress = useUploadProgress({
+    status,
+    size
+  });
   const uploadedSize = size * (progress / 100);
 
   return (
-    <div
-      key={id}
-      className="rounded-md border border-gray-200 bg-white p-3 shadow-sm sm:p-4"
-    >
+    <div key={id} className="rounded-md border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
       <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div className="mb-2 flex min-w-0 items-center space-x-3 sm:mb-0">
           <FileIcon className="h-5 w-5 flex-shrink-0 text-gray-400" />
@@ -195,9 +166,7 @@ function DownloadItem({
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <p className="text-xs font-medium text-gray-900">
-            {progress.toFixed(0)}%
-          </p>
+          <p className="text-xs font-medium text-gray-900">{progress.toFixed(0)}%</p>
           <Clock className="h-4 w-4 text-gray-400" />
         </div>
       </div>

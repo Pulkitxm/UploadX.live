@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { XIcon } from "lucide-react";
-import { ERROR } from "@/types/error";
+import { useSearchParams } from "next/navigation";
+import React, { useState } from "react";
+
 import { cn } from "@/lib/utils";
+import { ERROR } from "@/types/error";
 
 const LoginError = () => {
   const searchParams = useSearchParams();
@@ -28,9 +29,7 @@ const LoginError = () => {
     <div className={cn("w-full", "max-w-md")}>
       <div className="mb-4 flex w-full items-center justify-between rounded-lg border-2 border-red-500 p-2 text-red-600">
         <div className="flex gap-2">
-          <div className="text-sm">
-            {getErrorMessage(errorFormatted ?? "DEFAULT")}
-          </div>
+          <div className="text-sm">{getErrorMessage(errorFormatted ?? "DEFAULT")}</div>
         </div>
         <XIcon
           className="h-5 w-5 cursor-pointer"
@@ -39,8 +38,7 @@ const LoginError = () => {
             window.history.replaceState(
               {},
               "",
-              window.location.pathname +
-                window.location.search.replace(/(\?|&)error=[^&]*(&|$)/, "$1")
+              window.location.pathname + window.location.search.replace(/(\?|&)error=[^&]*(&|$)/, "$1")
             );
           }}
         />

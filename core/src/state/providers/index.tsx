@@ -1,27 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
 import { Session } from "next-auth";
-import {
-  UploadManagerMinimizeProvider,
-  UploadsProvider
-} from "@/state/providers/uploadsProvider";
+import { useEffect } from "react";
 
-export default function Providers({
-  children,
-  session
-}: {
-  children: React.ReactNode;
-  session: Session;
-}) {
+import { UploadManagerMinimizeProvider, UploadsProvider } from "@/state/providers/uploadsProvider";
+
+export default function Providers({ children, session }: { children: React.ReactNode; session: Session }) {
   useEffect(() => {
     try {
       if (!session?.user.img_token) return;
       const token = session.user.img_token;
 
       if (token) {
-        document.cookie =
-          "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
         document.cookie = `img_token=${token}`;
       }
     } catch (error) {

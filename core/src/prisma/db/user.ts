@@ -1,26 +1,25 @@
-import { AuthMode, EMAIL_USER, GOOGLE_USER } from "@/types/auth";
-import db from "@/prisma/db";
-import { ERROR } from "@/types/error";
 import { Prisma } from "@prisma/client";
-import { RES_TYPE } from "@/types/global";
-import { comparePassword, hashPassword } from "@/utils/hash";
+
 import {
   MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT,
   VERIFY_CODE_EXPIRY,
   VERIFY_CODE_GAP,
   VERIFY_CODE_RESEND_GAP
 } from "@/lib/config";
+import db from "@/prisma/db";
+import { AuthMode, EMAIL_USER, GOOGLE_USER } from "@/types/auth";
+import { ERROR } from "@/types/error";
+import { RES_TYPE } from "@/types/global";
+import { comparePassword, hashPassword } from "@/utils/hash";
 
-export async function findUser({
-  email,
-  mode
-}: {
-  email?: string;
-  mode: AuthMode;
-}): Promise<RES_TYPE> {
+export async function findUser({ email, mode }: { email?: string; mode: AuthMode }): Promise<RES_TYPE> {
   const user = await db.user.findFirst({
     where: {
-      OR: [{ email }]
+      OR: [
+        {
+          email
+        }
+      ]
     }
   });
 
@@ -72,10 +71,16 @@ export async function getUserIdOfGoogleUser(email: string): Promise<RES_TYPE> {
   });
 
   if (!user) {
-    return { status: "error", error: ERROR.USER_NOT_FOUND };
+    return {
+      status: "error",
+      error: ERROR.USER_NOT_FOUND
+    };
   }
 
-  return { status: "success", data: user.id };
+  return {
+    status: "success",
+    data: user.id
+  };
 }
 
 export async function createUser({
@@ -116,14 +121,23 @@ export async function createUser({
       if (error.code === "P2002") {
         const field = error.meta?.target as string[];
         if (field?.includes("email")) {
-          return { status: "error", error: ERROR.EMAIL_EXISTS };
+          return {
+            status: "error",
+            error: ERROR.EMAIL_EXISTS
+          };
         }
       } else if (error.code === "P2011") {
-        return { status: "error", error: ERROR.INVALID_LOGIN };
+        return {
+          status: "error",
+          error: ERROR.INVALID_LOGIN
+        };
       }
     }
 
-    return { status: "error", error: ERROR.DB_ERROR };
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
   }
 }
 
@@ -164,13 +178,7 @@ export async function getUserSessionData(email: string) {
   }
 }
 
-export async function changeName({
-  id,
-  name
-}: {
-  id: string;
-  name: string;
-}): Promise<RES_TYPE> {
+export async function changeName({ id, name }: { id: string; name: string }): Promise<RES_TYPE> {
   try {
     const updatedUser = await db.user.update({
       where: {
@@ -194,7 +202,10 @@ export async function changeName({
     };
   } catch (error) {
     console.error("changeName error:", error);
-    return { status: "error", error: ERROR.DB_ERROR };
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
   }
 }
 
@@ -230,7 +241,10 @@ export async function getAttemptsLeft(userId: string): Promise<RES_TYPE> {
     };
   } catch (error) {
     console.error("getAttemptsLeft error:", error);
-    return { status: "error", error: ERROR.DB_ERROR };
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
   }
 }
 
@@ -247,10 +261,14 @@ export async function setVerifyCode({
     const OrArr: Prisma.UserWhereInput[] = [];
 
     if (email) {
-      OrArr.push({ email });
+      OrArr.push({
+        email
+      });
     }
     if (userId) {
-      OrArr.push({ id: userId });
+      OrArr.push({
+        id: userId
+      });
     }
     const dbUser = await db.user.findFirst({
       where: {
@@ -276,8 +294,7 @@ export async function setVerifyCode({
         error: ERROR.USER_ALREADY_VERIFIED
       };
     } else if (
-      dbUser.verifyCodeChangeAttempts >=
-        MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT &&
+      dbUser.verifyCodeChangeAttempts >= MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT &&
       dbUser.verifyCodeChangeAttempts > 0
     ) {
       return {
@@ -285,8 +302,7 @@ export async function setVerifyCode({
         error: ERROR.VERIFY_CODE_CHANGE_ATTEMPTS_EXCEEDED
       };
     } else if (
-      new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime() <
-        VERIFY_CODE_RESEND_GAP &&
+      new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime() < VERIFY_CODE_RESEND_GAP &&
       dbUser.verifyCodeChangeAttempts > 0
     ) {
       return {
@@ -317,17 +333,14 @@ export async function setVerifyCode({
     };
   } catch (error) {
     console.error("setVerifyCode error:", error);
-    return { status: "error", error: ERROR.DB_ERROR };
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
   }
 }
 
-export async function verifyUser({
-  code,
-  userId
-}: {
-  code: string;
-  userId: string;
-}): Promise<RES_TYPE> {
+export async function verifyUser({ code, userId }: { code: string; userId: string }): Promise<RES_TYPE> {
   try {
     const dbUser = await db.user.findFirst({
       where: {
@@ -366,26 +379,19 @@ export async function verifyUser({
       }
     });
 
-    if (
-      VERIFY_CODE_EXPIRY -
-        (new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime()) <
-      0
-    ) {
+    if (VERIFY_CODE_EXPIRY - (new Date().getTime() - dbUser.lastVerifyResendAttempt.getTime()) < 0) {
       return {
         status: "error",
         error: ERROR.VERIFY_CODE_EXPIRED
       };
-    } else if (
-      dbUser.verifyCodeAttempts >= MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
-    ) {
+    } else if (dbUser.verifyCodeAttempts >= MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT) {
       return {
         status: "error",
         error: ERROR.VERIFY_CODE_ATTEMPTS_EXCEEDED
       };
     } else if (
       dbUser.lastVerifyAttempt &&
-      new Date().getTime() - dbUser.lastVerifyAttempt.getTime() <
-        VERIFY_CODE_GAP
+      new Date().getTime() - dbUser.lastVerifyAttempt.getTime() < VERIFY_CODE_GAP
     ) {
       return {
         status: "error",
@@ -418,7 +424,10 @@ export async function verifyUser({
     };
   } catch (error) {
     console.error("verifyUser error:", error);
-    return { status: "error", error: ERROR.DB_ERROR };
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
   }
 }
 
@@ -481,6 +490,9 @@ export async function resetPassword({
     };
   } catch (error) {
     console.error("resetPassword error:", error);
-    return { status: "error", error: ERROR.DB_ERROR };
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
   }
 }

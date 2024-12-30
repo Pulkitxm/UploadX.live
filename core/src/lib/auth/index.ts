@@ -1,16 +1,9 @@
-import {
-  AuthMode,
-  EMAIL_USER,
-  GOOGLE_USER,
-  googleUserSchema,
-  USER,
-  userSchema
-} from "@/types/auth";
+import { sendVerificationEmail } from "@/actions/sendEmail";
+import { uploadProfilePic_FileOrUrl } from "@/actions/storage/upload";
 import { createUser, findUser } from "@/prisma/db/user";
+import { AuthMode, EMAIL_USER, GOOGLE_USER, googleUserSchema, USER, userSchema } from "@/types/auth";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
-import { uploadProfilePic_FileOrUrl } from "@/actions/storage/upload";
-import { sendVerificationEmail } from "@/actions/sendEmail";
 
 export class Auth {
   user: USER;
@@ -72,10 +65,16 @@ export class Auth {
   }
 
   async signIn(): Promise<RES_TYPE> {
-    const dbUser = await findUser({ email: this.user.email, mode: this.mode });
+    const dbUser = await findUser({
+      email: this.user.email,
+      mode: this.mode
+    });
 
     if (dbUser.status === "error") {
-      return { status: "error", error: dbUser.error };
+      return {
+        status: "error",
+        error: dbUser.error
+      };
     }
 
     if (this.mode === AuthMode.GOOGLE) {
@@ -89,20 +88,35 @@ export class Auth {
           const res = await this.uploadGoogleImage();
 
           if (res?.status === "error") {
-            return { status: "error", error: res.error };
+            return {
+              status: "error",
+              error: res.error
+            };
           }
 
-          return { status: "success" };
+          return {
+            status: "success"
+          };
         }
-        return { status: "error", error: newDbUser.error };
+        return {
+          status: "error",
+          error: newDbUser.error
+        };
       } else {
-        return { status: "success" };
+        return {
+          status: "success"
+        };
       }
     } else {
       if (!dbUser.data) {
-        return { status: "error", error: ERROR.USER_NOT_FOUND };
+        return {
+          status: "error",
+          error: ERROR.USER_NOT_FOUND
+        };
       } else {
-        return { status: "success" };
+        return {
+          status: "success"
+        };
       }
     }
   }
@@ -113,7 +127,10 @@ export class Auth {
         email: this.user.email
       });
     } else {
-      return { status: "error", error: ERROR.INVALID_AUTH_MODE };
+      return {
+        status: "error",
+        error: ERROR.INVALID_AUTH_MODE
+      };
     }
   }
 }

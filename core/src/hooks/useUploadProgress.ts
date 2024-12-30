@@ -1,5 +1,6 @@
-import { FileUpload } from "@/types/file";
 import { useEffect, useState } from "react";
+
+import { FileUpload } from "@/types/file";
 
 function getRandWait(fileSize: number) {
   const baseDelay = Math.min(fileSize / 100_000, 5000);
@@ -7,13 +8,7 @@ function getRandWait(fileSize: number) {
   return Math.max(1000, baseDelay * randomFactor);
 }
 
-export const useUploadProgress = ({
-  size,
-  status
-}: {
-  status: FileUpload["status"];
-  size: number;
-}) => {
+export const useUploadProgress = ({ size, status }: { status: FileUpload["status"]; size: number }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {

@@ -1,7 +1,8 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { auth } from "@/auth";
 import { verifyUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -9,8 +10,13 @@ export async function GET(request: NextRequest) {
 
   if (!code) {
     return NextResponse.json(
-      { status: "error", error: ERROR.INVALID_CODE },
-      { status: 400 }
+      {
+        status: "error",
+        error: ERROR.INVALID_CODE
+      },
+      {
+        status: 400
+      }
     );
   }
 
@@ -18,25 +24,36 @@ export async function GET(request: NextRequest) {
 
   if (!session || !session.user) {
     return NextResponse.json(
-      { status: "error", error: ERROR.USER_NOT_FOUND },
-      { status: 401 }
+      {
+        status: "error",
+        error: ERROR.USER_NOT_FOUND
+      },
+      {
+        status: 401
+      }
     );
   }
 
   const userId = session.user.id;
 
-  const res = await verifyUser({ code, userId });
+  const res = await verifyUser({
+    code,
+    userId
+  });
 
   if (res.status === "error") {
     return NextResponse.json(
-      { status: "error", error: res.error },
-      { status: 400 }
+      {
+        status: "error",
+        error: res.error
+      },
+      {
+        status: 400
+      }
     );
   }
 
-  return NextResponse.redirect(
-    new URL("/verify-email", request.nextUrl.origin)
-  );
+  return NextResponse.redirect(new URL("/verify-email", request.nextUrl.origin));
 }
 
 export const dynamic = "force-dynamic";

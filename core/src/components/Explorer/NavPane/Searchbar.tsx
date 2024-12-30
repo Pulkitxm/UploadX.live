@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react";
-import { FaSearch } from "react-icons/fa";
 import { useRef, useState } from "react";
+import { FaSearch } from "react-icons/fa";
 
 export default function SearchBar() {
   const [loading, setLoading] = useState(false);
@@ -14,9 +14,7 @@ export default function SearchBar() {
       onClick={() => inputRef.current?.focus()}
     >
       <ICON
-        className={`h-4 w-4 cursor-pointer text-gray-500 ${
-          loading ? "animate-spin" : ""
-        }`}
+        className={`h-4 w-4 cursor-pointer text-gray-500 ${loading ? "animate-spin" : ""}`}
         onClick={(prev) => setLoading(!prev)}
       />
       <input

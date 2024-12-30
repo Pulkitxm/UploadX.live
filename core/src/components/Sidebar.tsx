@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { Settings, Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SIDEBAR_MENU_ITEMS } from "@/lib/config";
 
 function SidebarContent() {
@@ -36,11 +37,7 @@ export default function Sidebar() {
     <>
       <Sheet>
         <SheetTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="fixed left-4 top-20 z-30 lg:hidden"
-          >
+          <Button variant="ghost" size="icon" className="fixed left-4 top-20 z-30 lg:hidden">
             <Menu className="h-6 w-6" />
             <span className="sr-only">Toggle sidebar</span>
           </Button>

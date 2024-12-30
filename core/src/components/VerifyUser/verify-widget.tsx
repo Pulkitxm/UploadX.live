@@ -1,34 +1,18 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import {
-  getAttemptsLeftWithSession,
-  sendVerificationEmailWithSession,
-  verifyUserWithSession
-} from "@/actions/user";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
+import { useState, useEffect, useCallback } from "react";
 import { TbReload } from "react-icons/tb";
-import { showToast } from "@/components/toast";
-import {
-  MAX_VERIFICATION_ATTEMPTS_LIMIT,
-  MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT
-} from "@/lib/config";
 
-export default function VerifyEmailWidget({
-  initialValue
-}: {
-  initialValue: string | null;
-}) {
+import { getAttemptsLeftWithSession, sendVerificationEmailWithSession, verifyUserWithSession } from "@/actions/user";
+import { showToast } from "@/components/toast";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { MAX_VERIFICATION_ATTEMPTS_LIMIT, MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT } from "@/lib/config";
+import { ERROR } from "@/types/error";
+
+export default function VerifyEmailWidget({ initialValue }: { initialValue: string | null }) {
   const session = useSession();
   const [code, setCode] = useState(initialValue || "");
   const [initalCallDone, setInitalCallDone] = useState(false);
@@ -41,11 +25,8 @@ export default function VerifyEmailWidget({
   });
 
   const attemptsLeft = {
-    verifyCodeAttempts:
-      MAX_VERIFICATION_ATTEMPTS_LIMIT - userTries.verifyCodeAttempts,
-    verifyCodeChangeAttempts:
-      MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT -
-      userTries.verifyCodeChangeAttempts
+    verifyCodeAttempts: MAX_VERIFICATION_ATTEMPTS_LIMIT - userTries.verifyCodeAttempts,
+    verifyCodeChangeAttempts: MAX_VERIFICATION_RESEND_ATTEMPTS_LIMIT - userTries.verifyCodeChangeAttempts
   };
 
   const email = session.data?.user?.email || "";
@@ -75,7 +56,9 @@ export default function VerifyEmailWidget({
     if (!email) return;
     setIsVerifying(true);
     try {
-      const result = await verifyUserWithSession({ code });
+      const result = await verifyUserWithSession({
+        code
+      });
 
       if (result.status === "success") {
         showToast({
@@ -97,7 +80,7 @@ export default function VerifyEmailWidget({
       console.log(error);
 
       showToast({
-        message: "Failed to verify email. Please try again.",
+        message: ERROR.VERIFY_FAILED,
         type: "error"
       });
     } finally {
@@ -140,7 +123,7 @@ export default function VerifyEmailWidget({
       if (error)
         showToast({
           type: "error",
-          message: "Failed to send verification email. Please try again."
+          message: ERROR.VERIFY_FAILED
         });
     } finally {
       setIsResending(false);
@@ -155,7 +138,9 @@ export default function VerifyEmailWidget({
 
   useEffect(() => {
     if (initialValue && initalCallDone === false) {
-      verifyUserWithSession({ code: initialValue }).then(async (result) => {
+      verifyUserWithSession({
+        code: initialValue
+      }).then(async (result) => {
         if (result.status === "success") {
           setInitalCallDone(true);
           await session.update();
@@ -182,9 +167,7 @@ export default function VerifyEmailWidget({
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Verify Your Email</CardTitle>
-        <CardDescription>
-          Enter the verification code sent to your email
-        </CardDescription>
+        <CardDescription>Enter the verification code sent to your email</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
@@ -199,12 +182,7 @@ export default function VerifyEmailWidget({
             <Button
               type="submit"
               className="w-full"
-              disabled={
-                isVerifying ||
-                !email ||
-                !code ||
-                attemptsLeft.verifyCodeAttempts <= 0
-              }
+              disabled={isVerifying || !email || !code || attemptsLeft.verifyCodeAttempts <= 0}
               onClick={handleVerify}
             >
               {isVerifying ? (
@@ -224,9 +202,7 @@ export default function VerifyEmailWidget({
           onClick={handleResend}
           variant="outline"
           className="w-full"
-          disabled={
-            isResending || !email || attemptsLeft.verifyCodeChangeAttempts <= 0
-          }
+          disabled={isResending || !email || attemptsLeft.verifyCodeChangeAttempts <= 0}
         >
           {isResending ? (
             <>

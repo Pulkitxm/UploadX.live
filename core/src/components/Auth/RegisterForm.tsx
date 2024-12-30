@@ -1,15 +1,16 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { signUp } from "@/actions/auth";
-import { FormEvent, useState } from "react";
-import { ERROR } from "@/types/error";
-import { showToast } from "@/components/toast";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { FormEvent, useState } from "react";
+
+import { signUp } from "@/actions/auth";
+import { showToast } from "@/components/toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Auth } from "@/lib/auth";
 import { AuthMode } from "@/types/auth";
+import { ERROR } from "@/types/error";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -59,12 +60,7 @@ export default function RegisterForm() {
       rePassword: formData.get("rePassword") as string
     };
 
-    if (
-      !formValues.email ||
-      !formValues.name ||
-      !formValues.password ||
-      !formValues.rePassword
-    ) {
+    if (!formValues.email || !formValues.name || !formValues.password || !formValues.rePassword) {
       setLoading(false);
       return showToast({
         message: ERROR.REQUIRED,

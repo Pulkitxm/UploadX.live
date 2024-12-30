@@ -1,36 +1,72 @@
 "use server";
 
 import axios from "axios";
-import { ERROR } from "@/types/error";
-import { PROFILE_MAX_FILE_SIZE } from "@/types/error";
-import { RES_TYPE } from "@/types/global";
-import { uploadFile } from "@/actions/storage/utils";
+
+import { uploadFile } from "@/actions/storage/azure";
 import { auth } from "@/auth";
+import { PROFILE_MAX_FILE_SIZE, STORAGE_QUOTA } from "@/lib/config";
 import { getUserIdOfGoogleUser } from "@/prisma/db/user";
+import { ERROR } from "@/types/error";
+import { RES_TYPE } from "@/types/global";
+
+import { getCloudStorageUsed } from "./azure";
 
 export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
   try {
     const session = await auth();
 
     if (!session || !session.user) {
-      return { status: "error", error: ERROR.INVALID_SESSION };
+      return {
+        status: "error",
+        error: ERROR.INVALID_SESSION
+      };
     }
 
-    let file_to_upload: Buffer, contentType: string, fileName: string;
+    let file_to_upload: Buffer, contentType: string, fileName: string, size: number;
 
     if (file instanceof File) {
       const buffer = Buffer.from(await file.arrayBuffer());
       file_to_upload = buffer;
       contentType = file.type;
       fileName = file.name;
+      size = file.size;
     } else {
-      const response = await axios.get(file, { responseType: "arraybuffer" });
+      const response = await axios.get(file, {
+        responseType: "arraybuffer"
+      });
       if (!response.data) {
-        return { status: "error", error: ERROR.UPLOAD_FAILED };
+        return {
+          status: "error",
+          error: ERROR.UPLOAD_FAILED
+        };
       }
       file_to_upload = Buffer.from(response.data);
       contentType = "image/png";
       fileName = file;
+      size = file_to_upload.length;
+    }
+
+    if (size > STORAGE_QUOTA) {
+      return {
+        status: "error",
+        error: ERROR.PROFILE_PIC_TOO_LARGE
+      };
+    } else {
+      const res = await getCloudStorageUsed({
+        userId: session.user.id
+      });
+
+      if (res.status === "error") {
+        return res;
+      } else {
+        const used = res.data;
+        if (used + size > STORAGE_QUOTA) {
+          return {
+            status: "error",
+            error: ERROR.STORAGE_QUOTA_EXCEEDED
+          };
+        }
+      }
     }
 
     const result = await uploadFile({
@@ -39,7 +75,8 @@ export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
       filename: fileName,
       uploadConfig: {
         type: "FILE"
-      }
+      },
+      userId: session.user.id
     });
     return result;
   } catch (error) {
@@ -69,12 +106,18 @@ export async function uploadProfilePic_FileOrUrl(
     const fileSize = props.file.size;
 
     if (fileSize > PROFILE_MAX_FILE_SIZE) {
-      return { status: "error", error: ERROR.PROFILE_PIC_TOO_LARGE };
+      return {
+        status: "error",
+        error: ERROR.PROFILE_PIC_TOO_LARGE
+      };
     }
   }
 
   if (props.type !== "googleOnnboarding" && (!session || !session.user)) {
-    return { status: "error", error: ERROR.INVALID_SESSION };
+    return {
+      status: "error",
+      error: ERROR.INVALID_SESSION
+    };
   }
 
   if (props.file instanceof File && props.file.size > PROFILE_MAX_FILE_SIZE) {
@@ -84,7 +127,10 @@ export async function uploadProfilePic_FileOrUrl(
       err: ERROR.PROFILE_PIC_TOO_LARGE
     });
 
-    return { status: "error", error: ERROR.PROFILE_PIC_TOO_LARGE };
+    return {
+      status: "error",
+      error: ERROR.PROFILE_PIC_TOO_LARGE
+    };
   }
 
   let userId: string = "";
@@ -121,7 +167,8 @@ export async function uploadProfilePic_FileOrUrl(
     uploadConfig: {
       type: "PROFILE_PICTURE"
     },
-    filename: userId
+    filename: userId,
+    userId
   });
   return res;
 }
