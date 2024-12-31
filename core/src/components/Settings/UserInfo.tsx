@@ -19,7 +19,7 @@ export default function UserInfo() {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState("");
-  const [name, setName] = useState(session.data?.user?.name || "");
+  const [name, setName] = useState("");
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -113,6 +113,9 @@ export default function UserInfo() {
   useEffect(() => {
     setAvatar(session.data?.user?.image || "");
   }, [session.data?.user?.image]);
+  useEffect(() => {
+    setName(session.data?.user?.name || "");
+  }, [session.data?.user?.name]);
 
   return (
     <Card>

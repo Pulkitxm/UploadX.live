@@ -2,10 +2,14 @@
 
 import { sendVerificationEmail } from "@/actions/sendEmail";
 import { auth } from "@/auth";
+import { deleteFileDB, getFilesDB } from "@/prisma/db/file";
 import { changeName } from "@/prisma/db/user";
 import { getAttemptsLeft, resetPassword, verifyUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
+import { FileType } from "@/types/file";
 import { RES_TYPE } from "@/types/global";
+
+import { deleteFileFromCloud } from "./storage/azure";
 
 export async function editUser({ name }: { name: string }): Promise<RES_TYPE> {
   const session = await auth();
@@ -168,6 +172,57 @@ export async function resetPasswordForUserWithSession({
       };
   }
 
+  return {
+    status: "error",
+    error: ERROR.UNKNOWN
+  };
+}
+
+export async function getUserFiles(): Promise<RES_TYPE<FileType[]>> {
+  try {
+    const res = await getUserSessionData();
+    if (res.status === "error") return res;
+    const files = await getFilesDB({
+      userId: res.data
+    });
+    return files;
+  } catch (error) {
+    if (error)
+      return {
+        status: "error",
+        error: ERROR.DB_ERROR
+      };
+  }
+
+  return {
+    status: "error",
+    error: ERROR.UNKNOWN
+  };
+}
+
+export async function deleteFile(id: string): Promise<RES_TYPE> {
+  try {
+    const res = await getUserSessionData();
+    if (res.status === "error") return res;
+
+    const resCloud = await deleteFileFromCloud({
+      fileId: id,
+      userId: res.data
+    });
+
+    if (resCloud.status === "error") return resCloud;
+
+    return await deleteFileDB({
+      id,
+      userId: res.data
+    });
+  } catch (error) {
+    if (error)
+      return {
+        status: "error",
+        error: ERROR.DB_ERROR
+      };
+  }
   return {
     status: "error",
     error: ERROR.UNKNOWN

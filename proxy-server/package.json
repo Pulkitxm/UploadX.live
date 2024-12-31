@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "6.1.0",
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -21,13 +22,16 @@
     "http-proxy-middleware": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
     "mime-types": "^2.1.35",
-    "pg": "^8.13.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "prisma": "^6.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/http-proxy": "^1.17.15",
     "@types/jsonwebtoken": "^9.0.7",
     "ts-node": "^10.9.2"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
   }
 }

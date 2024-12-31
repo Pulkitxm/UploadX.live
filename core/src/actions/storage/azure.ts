@@ -79,3 +79,22 @@ export async function uploadFile({
     };
   }
 }
+
+export async function deleteFileFromCloud({ userId, fileId }: { userId: string; fileId: string }): Promise<RES_TYPE> {
+  try {
+    const containerClient = containerClientFile;
+    const blockBlobClient = containerClient.getBlockBlobClient(`${userId}/${fileId}`);
+
+    await blockBlobClient.delete();
+
+    return {
+      status: "success"
+    };
+  } catch (error) {
+    console.error("Storage delete error:", error);
+    return {
+      status: "error",
+      error: ERROR.DELETE_FAILED
+    };
+  }
+}

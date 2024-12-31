@@ -29,19 +29,22 @@ export function UploadManager({
   onClearCompleted
 }: UploadManagerProps) {
   const pathName = usePathname();
-  const [initialPath] = useState(pathName);
+  const [shouldMinimize, setShouldMinimize] = useState(false);
   const activeUploads = uploads.filter((u) => u.status === "uploading");
   const completedUploads = uploads.filter((u) => u.status === "completed");
   const failedUploads = uploads.filter((u) => u.status === "error");
-  const totalUploads = uploads.length;
+  const totalUploads = activeUploads.length;
 
   useEffect(() => {
-    if (pathName !== initialPath) {
+    if (shouldMinimize) {
       toggleMinimize({
         minimize: true
       });
+    } else {
+      setShouldMinimize(true);
     }
-  }, [initialPath, pathName, toggleMinimize]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathName, toggleMinimize]);
 
   return (
     <div

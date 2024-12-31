@@ -17,6 +17,15 @@ export interface FileUpload {
   createdAt: Date;
 }
 
+export interface FileType {
+  id: string;
+  name: string;
+  size: number;
+  createdAt: Date;
+  isPrivate: boolean;
+  isStarred: boolean;
+}
+
 export interface UploadProgress {
   progress: number;
   error: Error | null;

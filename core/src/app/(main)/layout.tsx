@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 import { auth } from "@/auth";
 import FileUploader from "@/components/Explorer/FileUploader";
 import NotVerified from "@/components/NotVerified";
@@ -12,7 +14,7 @@ export default async function MainAppLayout({
   const session = await auth();
 
   if (!session?.user || session?.user?.email === null) {
-    return children;
+    return redirect("/login");
   }
 
   return (

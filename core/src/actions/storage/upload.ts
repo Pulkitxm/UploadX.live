@@ -5,13 +5,14 @@ import axios from "axios";
 import { uploadFile } from "@/actions/storage/azure";
 import { auth } from "@/auth";
 import { PROFILE_MAX_FILE_SIZE, STORAGE_QUOTA } from "@/lib/config";
+import { addFile } from "@/prisma/db/file";
 import { getUserIdOfGoogleUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
 
 import { getCloudStorageUsed } from "./azure";
 
-export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
+export async function upload_FileOrUrl(file: File): Promise<RES_TYPE<string>> {
   try {
     const session = await auth();
 
@@ -22,29 +23,10 @@ export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
       };
     }
 
-    let file_to_upload: Buffer, contentType: string, fileName: string, size: number;
-
-    if (file instanceof File) {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      file_to_upload = buffer;
-      contentType = file.type;
-      fileName = file.name;
-      size = file.size;
-    } else {
-      const response = await axios.get(file, {
-        responseType: "arraybuffer"
-      });
-      if (!response.data) {
-        return {
-          status: "error",
-          error: ERROR.UPLOAD_FAILED
-        };
-      }
-      file_to_upload = Buffer.from(response.data);
-      contentType = "image/png";
-      fileName = file;
-      size = file_to_upload.length;
-    }
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const contentType = file.type;
+    const fileName = file.name;
+    const size = file.size;
 
     if (size > STORAGE_QUOTA) {
       return {
@@ -69,16 +51,32 @@ export async function upload_FileOrUrl(file: File | string): Promise<RES_TYPE> {
       }
     }
 
+    const fileIdDb = await addFile({
+      sizeInBytes: size,
+      userId: session.user.id,
+      name: fileName
+    });
+
+    if (fileIdDb.status === "error") return fileIdDb;
+
+    if (!fileIdDb.data) return { status: "error", error: ERROR.DB_ERROR };
+
     const result = await uploadFile({
-      buffer: file_to_upload,
+      buffer,
       contentType,
-      filename: fileName,
+      filename: fileIdDb.data,
       uploadConfig: {
         type: "FILE"
       },
       userId: session.user.id
     });
-    return result;
+
+    if (result.status === "error") return result;
+
+    return {
+      status: "success",
+      data: fileIdDb.data
+    };
   } catch (error) {
     console.error("Upload action error:", error);
     return {

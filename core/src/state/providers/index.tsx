@@ -5,6 +5,8 @@ import { useEffect } from "react";
 
 import { UploadManagerMinimizeProvider, UploadsProvider } from "@/state/providers/uploadsProvider";
 
+import { FilesProvider } from "./fileProvider";
+
 export default function Providers({ children, session }: { children: React.ReactNode; session: Session }) {
   useEffect(() => {
     try {
@@ -25,7 +27,9 @@ export default function Providers({ children, session }: { children: React.React
 
   return (
     <UploadsProvider>
-      <UploadManagerMinimizeProvider>{children}</UploadManagerMinimizeProvider>
+      <FilesProvider>
+        <UploadManagerMinimizeProvider>{children}</UploadManagerMinimizeProvider>
+      </FilesProvider>
     </UploadsProvider>
   );
 }

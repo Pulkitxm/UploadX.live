@@ -3,7 +3,7 @@ import NextAuth from "next-auth";
 import { Auth } from "@/lib/auth";
 import { authConfig } from "@/lib/auth/auth-config";
 import { getToken } from "@/lib/config";
-import { ASSETS_SERVR_BASE_URL, SECRET } from "@/lib/constants";
+import { NEXT_PUBLIC_ASSETS_SERVR_BASE_URL, SECRET } from "@/lib/constants";
 import { getUserSessionData } from "@/prisma/db/user";
 import { AuthMode, userLoginSchema } from "@/types/auth";
 import { ERROR } from "@/types/error";
@@ -102,7 +102,7 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
             loginType,
             email: token.email,
             name,
-            image: ASSETS_SERVR_BASE_URL + "/" + id + "?t=" + new Date().getTime(),
+            image: NEXT_PUBLIC_ASSETS_SERVR_BASE_URL + "/" + id + "?t=" + new Date().getTime(),
             img_token
           }
         };

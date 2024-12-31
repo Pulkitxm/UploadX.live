@@ -1,10 +1,10 @@
-import { ERROR } from "@/types/error";
+import { ERROR } from "./error";
 
-export type RES_TYPE =
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RES_TYPE<T = any> =
   | {
       status: "success";
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data?: any;
+      data?: T;
     }
   | {
       status: "error";

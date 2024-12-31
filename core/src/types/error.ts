@@ -47,6 +47,8 @@ export enum ERROR {
   PROFILE_PIC_TOO_LARGE = "Profile picture is too large. Please upload a smaller image.",
   STORAGE_QUOTA_EXCEEDED = "Storage quota exceeded. Free up space or contact support.",
   STORAGE_ERROR = "Storage error. Try again later.",
+  FILE_NOT_FOUND = "File not found. Please check the file and try again.",
+  DELETE_FAILED = "Failed to delete file. Please try again.",
 
   // Database Errors
   DB_ERROR = "Database error occurred. Try again later or contact support.",

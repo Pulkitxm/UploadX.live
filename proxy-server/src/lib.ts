@@ -6,6 +6,8 @@ export function getIdFromToken(token: string) {
   try {
     const res = jwt.verify(token, SECRET);
     const id = (res as any).id;
+    console.log("id", id);
+    
     return id;
   } catch (error) {
     return null;

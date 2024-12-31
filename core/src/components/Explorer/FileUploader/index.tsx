@@ -7,11 +7,13 @@ import { upload_FileOrUrl } from "@/actions/storage/upload";
 import { DragOverlay } from "@/components/Explorer/FileUploader/DragOverlay";
 import { UploadManager } from "@/components/Explorer/FileUploader/UploadManager";
 import { showToast } from "@/components/toast";
+import { FilesContext } from "@/state/context/file";
 import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
 import { FileUpload } from "@/types/file";
 
 export default function FileUploader() {
   const { status } = useSession();
+  const { addFile } = useContext(FilesContext);
   const [isDragging, setIsDragging] = useState(false);
   const { uploads, updateUploads } = useContext(UploadsContext);
   const { isMinimized, toggleMinimize } = useContext(UploadManagerMinimize);
@@ -60,19 +62,29 @@ export default function FileUploader() {
 
           updateUploads((prevUploads) => [...prevUploads, newUpload]);
 
-          // Start uploading the file immediately and handle each file independently
           upload_FileOrUrl(file)
             .then((res) => {
-              updateUploads((prevUploads) =>
-                prevUploads.map((upload) =>
+              if (res.status === "error") return showToast({ type: "error", message: res.error });
+              addFile({
+                id: res.data!,
+                name: file.name,
+                size: file.size,
+                createdAt: new Date(),
+                isPrivate: false,
+                isStarred: false
+              });
+              updateUploads((prevUploads) => {
+                const newUploads = prevUploads.map((upload) =>
                   upload.id === newUpload.id
                     ? {
                         ...upload,
-                        status: res.status === "success" ? "completed" : "error"
+                        id: res.data!,
+                        status: (res.status === "success" ? "completed" : "error") as FileUpload["status"]
                       }
                     : upload
-                )
-              );
+                );
+                return newUploads;
+              });
             })
             .catch(() => {
               updateUploads((prevUploads) =>
@@ -90,7 +102,7 @@ export default function FileUploader() {
         toggleMinimize();
       }
     },
-    [toggleMinimize, updateUploads]
+    [addFile, toggleMinimize, updateUploads]
   );
 
   const handleOpenFile = useCallback(
