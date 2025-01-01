@@ -23,6 +23,13 @@ export async function upload_FileOrUrl(file: File): Promise<RES_TYPE<string>> {
       };
     }
 
+    if (!session.user.isVerified) {
+      return {
+        status: "error",
+        error: ERROR.EMAIL_NOT_VERIFIED
+      };
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
     const contentType = file.type;
     const fileName = file.name;
@@ -41,7 +48,7 @@ export async function upload_FileOrUrl(file: File): Promise<RES_TYPE<string>> {
       if (res.status === "error") {
         return res;
       } else {
-        const used = res.data;
+        const used = res.data!;
         if (used + size > STORAGE_QUOTA) {
           return {
             status: "error",
@@ -115,6 +122,13 @@ export async function uploadProfilePic_FileOrUrl(
     return {
       status: "error",
       error: ERROR.INVALID_SESSION
+    };
+  }
+
+  if (props.type !== "googleOnnboarding" && !session?.user.isVerified) {
+    return {
+      status: "error",
+      error: ERROR.EMAIL_NOT_VERIFIED
     };
   }
 

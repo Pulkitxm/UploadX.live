@@ -7,6 +7,7 @@ import { upload_FileOrUrl } from "@/actions/storage/upload";
 import { DragOverlay } from "@/components/Explorer/FileUploader/DragOverlay";
 import { UploadManager } from "@/components/Explorer/FileUploader/UploadManager";
 import { showToast } from "@/components/toast";
+import { NEXT_PUBLIC_ASSETS_SERVR_BASE_URL } from "@/lib/constants";
 import { FilesContext } from "@/state/context/file";
 import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
 import { FileUpload } from "@/types/file";
@@ -64,7 +65,19 @@ export default function FileUploader() {
 
           upload_FileOrUrl(file)
             .then((res) => {
-              if (res.status === "error") return showToast({ type: "error", message: res.error });
+              if (res.status === "error") {
+                updateUploads((prevUploads) =>
+                  prevUploads.map((upload) =>
+                    upload.id === newUpload.id
+                      ? {
+                          ...upload,
+                          status: "error"
+                        }
+                      : upload
+                  )
+                );
+                return showToast({ type: "error", message: res.error });
+              }
               addFile({
                 id: res.data!,
                 name: file.name,
@@ -109,10 +122,7 @@ export default function FileUploader() {
     (fileId: string) => {
       const file = uploads.find((upload) => upload.id === fileId);
       if (file) {
-        showToast({
-          type: "success",
-          message: `Opening file: ${file.name}`
-        });
+        window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/f/${file.id}`, "_blank");
       }
     },
     [uploads]
@@ -126,7 +136,7 @@ export default function FileUploader() {
   );
 
   const handleClearCompleted = useCallback(() => {
-    updateUploads([]);
+    updateUploads((prevUploads) => prevUploads.filter((upload) => upload.status !== "completed"));
   }, [updateUploads]);
 
   useEffect(() => {

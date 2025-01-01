@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import httpProxy from "http-proxy";
 import {
+  APP_URL,
   BLOB_CDN_URL,
   BLOB_CONTAINER_FILES_PATH,
   BLOB_CONTAINER_IMAGES_PATH,
@@ -20,7 +21,7 @@ const proxy = httpProxy.createProxyServer({
 });
 
 app.get("/", (_req, res) => {
-  res.redirect("http://localhost:3000");
+  res.redirect(APP_URL);
 });
 
 app.get("/:userId", (req: Request, res: Response) => {
@@ -47,9 +48,10 @@ app.get("/:userId", (req: Request, res: Response) => {
   });
 });
 
-app.get("/f/:filePath(*)", async (request: any, response: any) => {
-  const filePath = request.params.filePath;
-  console.log("filePath", filePath);
+app.get("/f/:fileId(*)", async (request: any, response: any) => {
+  const fileId = request.params.fileId;
+  const download = request.query.download;
+  console.log("fileId", fileId);
 
   const img_token = getTokenFromReq(request);
   const id = getIdFromToken(img_token);
@@ -59,22 +61,50 @@ app.get("/f/:filePath(*)", async (request: any, response: any) => {
     });
   }
 
-  // const isPrivate = await isFilePrivate({
-  //   filePath,
-  //   userId: id,
-  // });
+  const res = await isFilePrivate({
+    fileId,
+    userId: id,
+  });
 
-  // console.log("isPrivate", isPrivate);
+  if (res.status === "error") {
+    return response.status(500).send({
+      message: "Error fetching file info",
+    });
+  }
+
+  const { isPrivate, name } = res.data;
+
+  console.log("isPrivate", { isPrivate, name });
 
   proxy.on("proxyReq", async (proxyReq, req) => {
     try {
-      proxyReq.path = `/${BLOB_CONTAINER_FILES_PATH}/${id}/${filePath}?${SAS_TOKEN}`;
+      proxyReq.path = `/${BLOB_CONTAINER_FILES_PATH}/${id}/${fileId}?${SAS_TOKEN}`;
       console.log(proxyReq.path);
 
       proxyReq.setHeader("X-Forwarded-Host", req.headers.host!);
       proxyReq.setHeader("Server", SERVER_NAME);
     } catch (error) {
       console.error("Error in proxyReq", error);
+    }
+  });
+
+  proxy.on("proxyRes", (proxyRes) => {
+    const safeName = decodeURIComponent(name)
+      .replace(/[\n\r"]+/g, "")
+      .replace(/[^\x20-\x7E]/g, "");
+
+    if (
+      !download &&
+      safeName &&
+      /\.(jpg|jpeg|png|gif|webp|svg|bmp|pdf|docx|doc|txt|xls|xlsx|ppt|pptx)$/.test(
+        safeName
+      )
+    ) {
+      proxyRes.headers["content-disposition"] =
+        `inline; filename="${safeName}"`;
+    } else {
+      proxyRes.headers["content-disposition"] =
+        `attachment; filename="${safeName}"`;
     }
   });
 

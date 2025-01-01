@@ -9,6 +9,7 @@ interface FilesContextType {
   reload: () => Promise<void>;
   deleteFile: (id: string) => Promise<void>;
   addFile: (file: FileType) => void;
+  renameFile: (id: string, newName: string) => void;
 }
 
 export const FilesContext = createContext<FilesContextType>({
@@ -17,5 +18,6 @@ export const FilesContext = createContext<FilesContextType>({
   loading: true,
   reload: async () => {},
   deleteFile: async () => {},
-  addFile: () => {}
+  addFile: () => {},
+  renameFile: async () => {}
 });

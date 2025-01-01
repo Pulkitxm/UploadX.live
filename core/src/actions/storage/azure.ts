@@ -14,7 +14,7 @@ export async function getCloudStorageUsed({ userId }: { userId: string }): Promi
   try {
     let totalSize = 0;
 
-    for await (const blob of containerClientProfile.listBlobsFlat({
+    for await (const blob of containerClientFile.listBlobsFlat({
       prefix: userId
     })) {
       totalSize += blob.properties.contentLength || 0;

@@ -2,7 +2,7 @@
 
 import { sendVerificationEmail } from "@/actions/sendEmail";
 import { auth } from "@/auth";
-import { deleteFileDB, getFilesDB } from "@/prisma/db/file";
+import { deleteFileDB, getFilesDB, renameFileDB } from "@/prisma/db/file";
 import { changeName } from "@/prisma/db/user";
 import { getAttemptsLeft, resetPassword, verifyUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
@@ -214,6 +214,30 @@ export async function deleteFile(id: string): Promise<RES_TYPE> {
 
     return await deleteFileDB({
       id,
+      userId: res.data
+    });
+  } catch (error) {
+    if (error)
+      return {
+        status: "error",
+        error: ERROR.DB_ERROR
+      };
+  }
+  return {
+    status: "error",
+    error: ERROR.UNKNOWN
+  };
+}
+
+export async function renameFile({ id, newName }: { id: string; newName: string }): Promise<RES_TYPE> {
+  try {
+    const res = await getUserSessionData();
+    if (res.status === "error") return res;
+    console.log("renameFile -> res", res);
+
+    return await renameFileDB({
+      id,
+      newName,
       userId: res.data
     });
   } catch (error) {

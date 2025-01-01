@@ -90,3 +90,35 @@ export async function deleteFileDB({ id, userId }: { id: string; userId: string 
     };
   }
 }
+
+export async function renameFileDB({
+  id,
+  userId,
+  newName
+}: {
+  id: string;
+  userId: string;
+  newName: string;
+}): Promise<RES_TYPE> {
+  try {
+    console.log("renameFileDB -> id", id);
+
+    await db.file.update({
+      where: {
+        id,
+        userId,
+        isDeleted: false
+      },
+      data: {
+        name: newName
+      }
+    });
+    return { status: "success" };
+  } catch (error) {
+    console.error("Error renaming file in database:", error);
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
+  }
+}

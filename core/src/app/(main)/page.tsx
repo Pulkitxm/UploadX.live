@@ -11,7 +11,7 @@ export default async function HomePage() {
     return redirect("/login?error=" + ERROR.UNAUTHORIZED);
   } else {
     return (
-      <div className="flex h-full w-full flex-col p-5">
+      <div className="flex h-full w-full flex-col gap-4 overflow-hidden p-5">
         <NavPane />
         <FilesList />
       </div>

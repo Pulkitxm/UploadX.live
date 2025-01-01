@@ -102,7 +102,7 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
             loginType,
             email: token.email,
             name,
-            image: NEXT_PUBLIC_ASSETS_SERVR_BASE_URL + "/" + id + "?t=" + new Date().getTime(),
+            image: NEXT_PUBLIC_ASSETS_SERVR_BASE_URL + "/pfp/" + id + "?t=" + new Date().getTime(),
             img_token
           }
         };

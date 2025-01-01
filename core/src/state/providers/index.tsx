@@ -14,8 +14,8 @@ export default function Providers({ children, session }: { children: React.React
       const token = session.user.img_token;
 
       if (token) {
-        document.cookie = "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        document.cookie = `img_token=${token}`;
+        document.cookie = "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost;";
+        document.cookie = `img_token=${token}; path=/; domain=.localhost;`;
       }
     } catch (error) {
       if (error) {

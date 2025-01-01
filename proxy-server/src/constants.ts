@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+export const APP_URL = process.env.APP_URL ?? "";
 export const SECRET = process.env.AUTH_SECRET ?? "";
 export const BLOB_CDN_URL = process.env.BLOB_CDN_URL ?? "";
 export const BLOB_CONTAINER_IMAGES_PATH =

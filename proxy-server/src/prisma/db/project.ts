@@ -4,33 +4,51 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function isFilePrivate({
-  filePath,
+  fileId,
   userId,
 }: {
   userId: string;
-  filePath: string;
-}): Promise<RES_TYPE<boolean>> {
+  fileId: string;
+}): Promise<
+  RES_TYPE<{
+    isPrivate: boolean;
+    name: string;
+  }>
+> {
+  console.log("isFilePrivate", { fileId, userId });
+
   try {
     const project = await prisma.file.findFirst({
       where: {
         userId: userId,
-        isPrivate: true,
-        path: filePath,
+        id: fileId,
       },
       select: {
         id: true,
         isPrivate: true,
+        name: true,
       },
     });
 
-    if (!project || !project?.id) {
+    if (
+      !project ||
+      !project?.id ||
+      !project?.name ||
+      !("isPrivate" in project)
+    ) {
       return {
         status: "error",
         error: "File not found",
       };
     }
 
-    return { status: "success", data: project.isPrivate };
+    return {
+      status: "success",
+      data: {
+        isPrivate: project.isPrivate,
+        name: project.name,
+      },
+    };
   } catch (err) {
     console.error(err);
     return {

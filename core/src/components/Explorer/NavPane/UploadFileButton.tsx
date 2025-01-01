@@ -43,7 +43,19 @@ export default function UploadFileButton() {
 
       upload_FileOrUrl(file)
         .then((res) => {
-          if (res.status === "error") return showToast({ type: "error", message: res.error });
+          if (res.status === "error") {
+            updateUploads((prevUploads) =>
+              prevUploads.map((upload) =>
+                upload.id === newUpload.id
+                  ? {
+                      ...upload,
+                      status: "error"
+                    }
+                  : upload
+              )
+            );
+            return showToast({ type: "error", message: res.error });
+          }
           updateUploads((prevUploads) => {
             const newUploads = prevUploads.map((upload) =>
               upload.id === newUpload.id

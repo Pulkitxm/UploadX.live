@@ -26,12 +26,21 @@ export const FilesProvider: React.FC<{
   }, []);
 
   const handleDeletFile = useCallback(async (id: string) => {
-    setLoading(true);
     const res = await deleteFile(id);
     if (res.status === "success") {
       setFiles((prevFiles) => prevFiles.filter((file) => file.id !== id));
     }
-    setLoading(false);
+  }, []);
+
+  const handelRenameFile = useCallback((id: string, newName: string) => {
+    setFiles((prevFiles) =>
+      prevFiles.map((file) => {
+        if (file.id === id) {
+          return { ...file, name: newName };
+        }
+        return file;
+      })
+    );
   }, []);
 
   useEffect(() => {
@@ -40,7 +49,15 @@ export const FilesProvider: React.FC<{
 
   return (
     <FilesContext.Provider
-      value={{ files, setFiles, loading, reload: handleFetchFiles, deleteFile: handleDeletFile, addFile }}
+      value={{
+        files,
+        setFiles,
+        loading,
+        reload: handleFetchFiles,
+        deleteFile: handleDeletFile,
+        addFile,
+        renameFile: handelRenameFile
+      }}
     >
       {children}
     </FilesContext.Provider>
