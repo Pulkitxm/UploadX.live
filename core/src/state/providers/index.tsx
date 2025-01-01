@@ -12,10 +12,11 @@ export default function Providers({ children, session }: { children: React.React
     try {
       if (!session?.user.img_token) return;
       const token = session.user.img_token;
+      console.log(process.env.NODE_ENV);
 
       if (token) {
-        document.cookie = "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.localhost;";
-        document.cookie = `img_token=${token}; path=/; domain=.localhost;`;
+        document.cookie = "img_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.uploadx.live;";
+        document.cookie = `img_token=${token}; path=/; domain=.uploadx.live; secure; SameSite=None;`;
       }
     } catch (error) {
       if (error) {

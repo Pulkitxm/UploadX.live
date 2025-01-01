@@ -23,15 +23,15 @@ export default function RegisterForm() {
     required: boolean;
   }[] = [
     {
-      name: "email",
-      type: "email",
-      placeholder: "Email",
-      required: true
-    },
-    {
       name: "name",
       type: "text",
       placeholder: "Name",
+      required: true
+    },
+    {
+      name: "email",
+      type: "email",
+      placeholder: "Email",
       required: true
     },
     {
@@ -57,8 +57,11 @@ export default function RegisterForm() {
       email: formData.get("email") as string,
       name: formData.get("name") as string,
       password: formData.get("password") as string,
-      rePassword: formData.get("rePassword") as string
+      rePassword: formData.get("rePassword") as string,
+      username: ""
     };
+
+    formValues.username = formValues.email.split("@")[0];
 
     if (!formValues.email || !formValues.name || !formValues.password || !formValues.rePassword) {
       setLoading(false);

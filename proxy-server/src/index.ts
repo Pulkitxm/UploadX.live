@@ -10,8 +10,7 @@ import {
   SECRET,
   SERVER_NAME,
 } from "./constants";
-import { getIdFromToken, getTokenFromReq } from "./lib";
-import { isFilePrivate } from "./prisma/db/project";
+import { getIdFromUsername, isFilePrivate } from "./prisma/db/project";
 
 const app = express();
 app.use(express.json());
@@ -20,76 +19,29 @@ const proxy = httpProxy.createProxyServer({
   changeOrigin: true,
 });
 
-app.get("/", (_req, res) => {
-  res.redirect(APP_URL);
+proxy.on("proxyReq", async (proxyReq, req: any) => {
+  try {
+    const { proxyType, username, fileId, userId } = req.locals || {};
+
+    if (proxyType === "profile") {
+      const imagePath = `/${BLOB_CONTAINER_IMAGES_PATH}/${userId}`;
+      proxyReq.path = imagePath;
+    } else if (proxyType === "file") {
+      proxyReq.path = `/${BLOB_CONTAINER_FILES_PATH}/${userId}/${fileId}?${SAS_TOKEN}`;
+    }
+
+    proxyReq.setHeader("Server", SERVER_NAME);
+    proxyReq.setHeader("X-Forwarded-Host", req.headers.host!);
+  } catch (error) {
+    console.error("Error in proxyReq:", error);
+  }
 });
 
-app.get("/:userId", (req: Request, res: Response) => {
-  proxy.on("proxyReq", (proxyReq, req: any) => {
-    try {
-      const userId = req.params?.userId;
-      const currentServerUrl = req.protocol + "://" + req.get("host");
-      console.log("currentServerUrl", currentServerUrl);
+proxy.on("proxyRes", (proxyRes, req: any) => {
+  const { proxyType, fileName, download } = req.locals || {};
 
-      if (userId) {
-        proxyReq.path = `/${BLOB_CONTAINER_IMAGES_PATH}/${userId}`;
-        console.log(proxyReq.path);
-      }
-
-      proxyReq.setHeader("Server", SERVER_NAME);
-    } catch (error) {
-      console.error("Error in proxyReq", error);
-    }
-  });
-
-  proxy.web(req, res, { target: BLOB_CDN_URL }, (error) => {
-    console.error("Proxy error:", error);
-    res.status(500).send({ error: "Proxy request failed" });
-  });
-});
-
-app.get("/f/:fileId(*)", async (request: any, response: any) => {
-  const fileId = request.params.fileId;
-  const download = request.query.download;
-  console.log("fileId", fileId);
-
-  const img_token = getTokenFromReq(request);
-  const id = getIdFromToken(img_token);
-  if (!img_token) {
-    return response.status(401).send({
-      message: "Uh oh! You are not authorized to access this resource",
-    });
-  }
-
-  const res = await isFilePrivate({
-    fileId,
-    userId: id,
-  });
-
-  if (res.status === "error") {
-    return response.status(500).send({
-      message: "Error fetching file info",
-    });
-  }
-
-  const { isPrivate, name } = res.data;
-
-  console.log("isPrivate", { isPrivate, name });
-
-  proxy.on("proxyReq", async (proxyReq, req) => {
-    try {
-      proxyReq.path = `/${BLOB_CONTAINER_FILES_PATH}/${id}/${fileId}?${SAS_TOKEN}`;
-      console.log(proxyReq.path);
-
-      proxyReq.setHeader("X-Forwarded-Host", req.headers.host!);
-      proxyReq.setHeader("Server", SERVER_NAME);
-    } catch (error) {
-      console.error("Error in proxyReq", error);
-    }
-  });
-
-  proxy.on("proxyRes", (proxyRes) => {
-    const safeName = decodeURIComponent(name)
+  if (proxyType === "file") {
+    const safeName = decodeURIComponent(fileName)
       .replace(/[\n\r"]+/g, "")
       .replace(/[^\x20-\x7E]/g, "");
 
@@ -106,11 +58,74 @@ app.get("/f/:fileId(*)", async (request: any, response: any) => {
       proxyRes.headers["content-disposition"] =
         `attachment; filename="${safeName}"`;
     }
-  });
+  }
+});
 
-  proxy.web(request, response, {
-    target: BLOB_CDN_URL,
-  });
+app.get("/", (_req, res) => {
+  res.redirect(APP_URL);
+});
+
+// @ts-ignore
+app.get("/:username/pfp", async (req: Request, res: Response) => {
+  try {
+    const { username } = req.params;
+    const resId = await getIdFromUsername({ username });
+
+    if (resId.status === "error") {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const { id: userId } = resId.data;
+    // @ts-ignore
+    req.locals = { proxyType: "profile", username, userId };
+
+    proxy.web(req, res, { target: BLOB_CDN_URL }, (error) => {
+      console.error("Proxy error:", error);
+      res.status(500).send({ error: "Proxy request failed" });
+    });
+  } catch (error) {
+    console.error("Error in /pfp route:", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+// @ts-ignore
+app.get("/:username/:fileName", async (req: Request, res: Response) => {
+  try {
+    const { username, fileName } = req.params;
+    const download = req.query.download;
+
+    const resId = await getIdFromUsername({ username });
+    if (resId.status === "error") {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const { id: userId } = resId.data;
+    const fileInfo = await isFilePrivate({ fileName, userId });
+
+    if (fileInfo.status === "error") {
+      return res.status(500).send({ message: "File not found" });
+    }
+
+    const { fileId } = fileInfo.data;
+    // @ts-ignore
+    req.locals = {
+      proxyType: "file",
+      username,
+      fileId,
+      userId,
+      fileName,
+      download,
+    };
+
+    proxy.web(req, res, { target: BLOB_CDN_URL }, (error) => {
+      console.error("Proxy error:", error);
+      res.status(500).send({ error: "Proxy request failed" });
+    });
+  } catch (error) {
+    console.error("Error in /file route:", error);
+    res.status(500).send({ error: "Internal Server Error" });
+  }
 });
 
 app.listen(PORT, () => {

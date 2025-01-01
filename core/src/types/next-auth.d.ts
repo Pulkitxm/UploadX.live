@@ -7,6 +7,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string;
+      username: string;
       isVerified: boolean;
       loginType: AuthMode;
       img_token: string;

@@ -49,6 +49,7 @@ export enum ERROR {
   STORAGE_ERROR = "Storage error. Try again later.",
   FILE_NOT_FOUND = "File not found. Please check the file and try again.",
   DELETE_FAILED = "Failed to delete file. Please try again.",
+  FILE_EXISTS = "File with the same name already exists. Please rename the file.",
 
   // Database Errors
   DB_ERROR = "Database error occurred. Try again later or contact support.",

@@ -1,4 +1,5 @@
 import { File, Star, Lock, MoreVertical, Trash2, Download, Eye, Pencil, Share2 } from "lucide-react";
+import { useSession } from "next-auth/react";
 import React, { useState } from "react";
 
 import { showToast } from "@/components/toast";
@@ -25,7 +26,12 @@ interface FileItemProps {
 }
 
 export function FileItem({ file, deleteFile, isSelected, onSelect }: FileItemProps) {
+  const session = useSession();
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+
+  const username = session.data?.user?.username;
+
+  if (!username) return null;
 
   return (
     <tr className="flex w-full flex-col border-b last:border-b-0 hover:bg-muted/50 sm:table-row">
@@ -42,7 +48,7 @@ export function FileItem({ file, deleteFile, isSelected, onSelect }: FileItemPro
                 className="cursor-pointer truncate font-medium hover:underline"
                 title={file.name}
                 onClick={() => {
-                  window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/f/${file.id}`, "_blank");
+                  window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/${username}/${file.name}`, "_blank");
                 }}
               >
                 {file.name}
@@ -86,17 +92,14 @@ export function FileItem({ file, deleteFile, isSelected, onSelect }: FileItemPro
           <DropdownMenuContent align="end">
             <DropdownMenuItem
               onClick={() => {
-                window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/f/${file.id}`, "_blank");
+                window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/${username}/${file.name}`, "_blank");
               }}
             >
               <Eye className="mr-2 h-4 w-4" /> View
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                window.open(
-                  `${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/f/${file.id}?download=true&ts=${Date.now()}`,
-                  "_blank"
-                )
+                window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/${username}/${file.name}?download=true`, "_blank")
               }
             >
               <Download className="mr-2 h-4 w-4" /> Download
@@ -106,7 +109,7 @@ export function FileItem({ file, deleteFile, isSelected, onSelect }: FileItemPro
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
-                navigator.clipboard.writeText(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/f/${file.id}`);
+                navigator.clipboard.writeText(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/${username}/${file.name}`);
                 showToast({
                   message: "Link copied to clipboard",
                   type: "success"

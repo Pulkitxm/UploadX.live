@@ -3,7 +3,7 @@
 import { sendVerificationEmail } from "@/actions/sendEmail";
 import { auth } from "@/auth";
 import { deleteFileDB, getFilesDB, renameFileDB } from "@/prisma/db/file";
-import { changeName } from "@/prisma/db/user";
+import { editUserDB } from "@/prisma/db/user";
 import { getAttemptsLeft, resetPassword, verifyUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
 import { FileType } from "@/types/file";
@@ -11,7 +11,7 @@ import { RES_TYPE } from "@/types/global";
 
 import { deleteFileFromCloud } from "./storage/azure";
 
-export async function editUser({ name }: { name: string }): Promise<RES_TYPE> {
+export async function editUser({ name, username }: { name: string; username: string }): Promise<RES_TYPE> {
   const session = await auth();
 
   if (!session || !session.user) {
@@ -22,9 +22,10 @@ export async function editUser({ name }: { name: string }): Promise<RES_TYPE> {
   }
 
   const id = session.user.id;
-  const updatedUser = await changeName({
+  const updatedUser = await editUserDB({
     id,
-    name
+    name,
+    username
   });
 
   if (updatedUser.status === "error") {

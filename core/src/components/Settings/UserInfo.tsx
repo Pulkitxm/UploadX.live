@@ -19,7 +19,10 @@ export default function UserInfo() {
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatar, setAvatar] = useState("");
-  const [name, setName] = useState("");
+  const [values, setValues] = useState({
+    name: "",
+    username: ""
+  });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,7 +79,7 @@ export default function UserInfo() {
   const handleNameChange = async () => {
     if (!session.data?.user?.id) return;
 
-    if (name === session.data?.user?.name) {
+    if (values.name === session.data?.user?.name && values.username === session.data?.user?.username) {
       return showToast({
         message: ERROR.NO_CHANGE,
         type: "error"
@@ -85,7 +88,8 @@ export default function UserInfo() {
 
     try {
       const response = await editUser({
-        name
+        name: values.name,
+        username: values.username
       });
 
       if (response.status === "success") {
@@ -114,8 +118,11 @@ export default function UserInfo() {
     setAvatar(session.data?.user?.image || "");
   }, [session.data?.user?.image]);
   useEffect(() => {
-    setName(session.data?.user?.name || "");
-  }, [session.data?.user?.name]);
+    setValues({
+      name: session.data?.user?.name || "",
+      username: session.data?.user?.username || ""
+    });
+  }, [session.data?.user]);
 
   return (
     <Card>
@@ -155,7 +162,35 @@ export default function UserInfo() {
           <Label htmlFor="name">Name</Label>
           <div className="relative">
             <User className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="pl-8" />
+            <Input
+              id="name"
+              value={values.name}
+              onChange={(e) =>
+                setValues((prev) => ({
+                  ...prev,
+                  name: e.target.value
+                }))
+              }
+              className="pl-8"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="name">Name</Label>
+          <div className="relative">
+            <User className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              id="name"
+              value={values.username}
+              onChange={(e) =>
+                setValues((prev) => ({
+                  ...prev,
+                  username: e.target.value
+                }))
+              }
+              className="pl-8"
+            />
           </div>
         </div>
 

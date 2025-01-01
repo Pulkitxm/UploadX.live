@@ -16,6 +16,7 @@ enum LoginType {
 model User {
   id                       String    @id @default(cuid())
   name                     String
+  username                 String    @unique
   password                 String?
   loginType                LoginType @default(EMAIL)
   email                    String    @unique
@@ -45,4 +46,6 @@ model File {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   sharedTo    User[]   @relation("SharedFiles")
+
+  @@unique([name, userId])
 }

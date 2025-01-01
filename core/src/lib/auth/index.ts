@@ -6,7 +6,9 @@ import { ERROR } from "@/types/error";
 import { RES_TYPE } from "@/types/global";
 
 export class Auth {
-  user: USER;
+  user: USER & {
+    username: string;
+  };
   mode: AuthMode;
   imageUrl?: string;
 
@@ -27,7 +29,8 @@ export class Auth {
     if (props.mode === AuthMode.GOOGLE) {
       this.user = {
         name: props.user.name,
-        email: props.user.email
+        email: props.user.email,
+        username: props.user.email.split("@")[0]
       };
 
       const url = props.imageUrl;
@@ -35,7 +38,8 @@ export class Auth {
     } else {
       this.user = {
         name: props.user.name,
-        email: props.user.email
+        email: props.user.email,
+        username: props.user.username ?? props.user.email.split("@")[0]
       };
     }
   }

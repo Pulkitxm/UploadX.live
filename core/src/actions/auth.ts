@@ -8,8 +8,10 @@ import { RES_TYPE } from "@/types/global";
 export async function signUp({
   email,
   name,
-  password
+  password,
+  username
 }: {
+  username: string;
   name: string;
   password: string;
   email: string;
@@ -31,7 +33,8 @@ export async function signUp({
       user: {
         email,
         name,
-        password
+        password,
+        username
       }
     });
 

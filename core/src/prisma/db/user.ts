@@ -88,11 +88,15 @@ export async function createUser({
   user
 }:
   | {
-      user: GOOGLE_USER;
+      user: GOOGLE_USER & {
+        username: string;
+      };
       type: AuthMode.GOOGLE;
     }
   | {
-      user: EMAIL_USER;
+      user: EMAIL_USER & {
+        username: string;
+      };
       type: AuthMode.EMAIL;
     }): Promise<RES_TYPE> {
   try {
@@ -105,6 +109,7 @@ export async function createUser({
     const newUser = await db.user.create({
       data: {
         name: user.name,
+        username: user.username,
         email: user.email,
         isVerified: type === AuthMode.GOOGLE,
         loginType: type,
@@ -149,6 +154,7 @@ export async function getUserSessionData(email: string) {
       },
       select: {
         id: true,
+        username: true,
         isVerified: true,
         loginType: true,
         name: true
@@ -167,7 +173,8 @@ export async function getUserSessionData(email: string) {
       id: dbUser.id,
       isVerified: dbUser.isVerified,
       loginType: AuthMode[dbUser.loginType],
-      name: dbUser.name
+      name: dbUser.name,
+      username: dbUser.username
     };
   } catch (error) {
     console.error("isUserVerified error:", error);
@@ -178,14 +185,23 @@ export async function getUserSessionData(email: string) {
   }
 }
 
-export async function changeName({ id, name }: { id: string; name: string }): Promise<RES_TYPE> {
+export async function editUserDB({
+  id,
+  name,
+  username
+}: {
+  id: string;
+  name: string;
+  username: string;
+}): Promise<RES_TYPE> {
   try {
     const updatedUser = await db.user.update({
       where: {
         id
       },
       data: {
-        name
+        name,
+        username
       },
       select: {
         id: true,

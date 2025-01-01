@@ -76,7 +76,7 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
 
     async session({ session, token, trigger }) {
       try {
-        const { id, isVerified, loginType, name } = await getUserSessionData(token.email!);
+        const { id, isVerified, loginType, name, username } = await getUserSessionData(token.email!);
 
         if (!id) {
           throw new Error(ERROR.USER_NOT_FOUND);
@@ -98,11 +98,12 @@ export const { handlers, signIn, auth, signOut } = NextAuth({
           user: {
             ...session.user,
             id,
+            username,
             isVerified: isVerified || false,
             loginType,
             email: token.email,
             name,
-            image: NEXT_PUBLIC_ASSETS_SERVR_BASE_URL + "/pfp/" + id + "?t=" + new Date().getTime(),
+            image: NEXT_PUBLIC_ASSETS_SERVR_BASE_URL + "/" + username + "/pfp/" + "?t=" + new Date().getTime(),
             img_token
           }
         };

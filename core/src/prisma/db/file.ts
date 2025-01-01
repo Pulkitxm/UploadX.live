@@ -78,7 +78,8 @@ export async function deleteFileDB({ id, userId }: { id: string; userId: string 
         userId
       },
       data: {
-        isDeleted: true
+        isDeleted: true,
+        name: id + "-del"
       }
     });
     return { status: "success" };
@@ -102,6 +103,24 @@ export async function renameFileDB({
 }): Promise<RES_TYPE> {
   try {
     console.log("renameFileDB -> id", id);
+
+    const dbFile = await db.file.findFirst({
+      where: {
+        name: newName,
+        userId,
+        isDeleted: false
+      },
+      select: {
+        id: true
+      }
+    });
+
+    if (dbFile && dbFile.id) {
+      return {
+        status: "error",
+        error: ERROR.FILE_EXISTS
+      };
+    }
 
     await db.file.update({
       where: {
