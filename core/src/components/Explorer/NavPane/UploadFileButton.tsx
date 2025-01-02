@@ -104,16 +104,26 @@ export default function UploadFileButton() {
     <div className="flex items-center gap-2">
       <button
         className={`flex h-10 items-center justify-center gap-1 rounded-md p-4 ${
-          isVerified ? "bg-red-400 hover:bg-red-500" : "bg-gray-100"
+          isVerified ? "bg-red-400 hover:bg-red-500" : "cursor-not-allowed bg-gray-100"
         } text-gray-500`}
         onClick={() => {
           inputRef.current?.click();
         }}
+        title={!isVerified ? "Please verify your email to upload files" : undefined}
       >
         Upload
         <UploadIcon className="size-4 text-gray-500" />
       </button>
-      <input type="file" className="hidden" multiple ref={inputRef} onChange={handleFileInput} required min={1} />
+      <input
+        type="file"
+        className="hidden"
+        multiple
+        ref={inputRef}
+        onChange={handleFileInput}
+        required
+        min={1}
+        disabled={!isVerified}
+      />
     </div>
   );
 }

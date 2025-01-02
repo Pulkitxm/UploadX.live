@@ -10,6 +10,8 @@ interface FilesContextType {
   deleteFile: (id: string) => Promise<void>;
   addFile: (file: FileType) => void;
   renameFile: (id: string, newName: string) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 export const FilesContext = createContext<FilesContextType>({
@@ -19,5 +21,7 @@ export const FilesContext = createContext<FilesContextType>({
   reload: async () => {},
   deleteFile: async () => {},
   addFile: () => {},
-  renameFile: async () => {}
+  renameFile: async () => {},
+  searchQuery: "",
+  setSearchQuery: () => {}
 });

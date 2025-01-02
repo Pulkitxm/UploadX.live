@@ -3,10 +3,16 @@
 import { XIcon } from "lucide-react";
 import Link from "next/link";
 import { Session } from "next-auth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function NotVerified({ session }: { session: Session }) {
-  const [show, setShow] = useState(session && !session.user.isVerified);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (session?.user) {
+      setShow(session.user.email === null || !session.user.isVerified);
+    }
+  }, [session]);
 
   if (show)
     return (

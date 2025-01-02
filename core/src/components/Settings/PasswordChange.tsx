@@ -13,9 +13,9 @@ import { ERROR } from "@/types/error";
 
 export default function PasswordChange() {
   const [config, setConfig] = useState({
-    password: "pulkit1",
-    newPassword: "pulkit",
-    confirmNewPassword: "pulkit"
+    password: "",
+    newPassword: "",
+    confirmNewPassword: ""
   });
 
   async function handlePasswordReset(e: FormEvent<HTMLFormElement>) {

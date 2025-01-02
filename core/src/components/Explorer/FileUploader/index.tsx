@@ -13,12 +13,15 @@ import { UploadManagerMinimize, UploadsContext } from "@/state/context/upload";
 import { FileUpload } from "@/types/file";
 
 export default function FileUploader() {
-  const { status } = useSession();
+  const { status, data } = useSession();
   const { addFile } = useContext(FilesContext);
   const [isDragging, setIsDragging] = useState(false);
   const { uploads, updateUploads } = useContext(UploadsContext);
   const { isMinimized, toggleMinimize } = useContext(UploadManagerMinimize);
   const dragCounter = useRef(0);
+
+  const isVerified = data?.user?.isVerified;
+  const username = data?.user?.username;
 
   const handleDrag = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -122,10 +125,10 @@ export default function FileUploader() {
     (fileId: string) => {
       const file = uploads.find((upload) => upload.id === fileId);
       if (file) {
-        window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/f/${file.id}`, "_blank");
+        window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/${username}/${file.name}`);
       }
     },
-    [uploads]
+    [uploads, username]
   );
 
   const handleRemoveFile = useCallback(
@@ -140,6 +143,7 @@ export default function FileUploader() {
   }, [updateUploads]);
 
   useEffect(() => {
+    if (!isVerified) return;
     const bodyElement = document.body;
     bodyElement.addEventListener("dragenter", handleDragIn as unknown as EventListener);
     bodyElement.addEventListener("dragleave", handleDragOut as unknown as EventListener);
@@ -152,9 +156,9 @@ export default function FileUploader() {
       bodyElement.removeEventListener("dragover", handleDrag as unknown as EventListener);
       bodyElement.removeEventListener("drop", handleDrop as unknown as EventListener);
     };
-  }, [handleDrag, handleDragIn, handleDragOut, handleDrop]);
+  }, [handleDrag, handleDragIn, handleDragOut, handleDrop, isVerified]);
 
-  if (status === "loading") return null;
+  if (status === "loading" || !isVerified) return null;
 
   return (
     <>

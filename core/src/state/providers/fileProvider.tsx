@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, ReactNode, useEffect, useCallback } from "react";
+import React, { useState, ReactNode, useEffect, useCallback, useMemo } from "react";
 
 import { deleteFile, getUserFiles } from "@/actions/user";
 import { FilesContext } from "@/state/context/file";
@@ -10,7 +10,18 @@ export const FilesProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
   const [files, setFiles] = useState<FileType[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const fileWithQuery = useMemo(() => {
+    if (!searchQuery) return files;
+    return files.filter((file) => file.name.includes(searchQuery));
+  }, [files, searchQuery]);
+
+  const changeQuery = useCallback((query: string) => {
+    localStorage.setItem("searchQuery", query);
+    setSearchQuery(query);
+  }, []);
 
   const handleFetchFiles = useCallback(async () => {
     setLoading(true);
@@ -46,17 +57,22 @@ export const FilesProvider: React.FC<{
   useEffect(() => {
     handleFetchFiles();
   }, [handleFetchFiles]);
+  useEffect(() => {
+    setSearchQuery(localStorage.getItem("searchQuery") || "");
+  }, []);
 
   return (
     <FilesContext.Provider
       value={{
-        files,
+        files: fileWithQuery,
         setFiles,
         loading,
         reload: handleFetchFiles,
         deleteFile: handleDeletFile,
         addFile,
-        renameFile: handelRenameFile
+        renameFile: handelRenameFile,
+        searchQuery,
+        setSearchQuery: changeQuery
       }}
     >
       {children}

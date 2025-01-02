@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { auth } from "@/auth";
+import { NEXTAUTH_URL } from "@/lib/constants";
 import { verifyUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
 
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  return NextResponse.redirect(new URL("/verify-email", request.nextUrl.origin));
+  return NextResponse.redirect(NEXTAUTH_URL + "/verify-email");
 }
 
 export const dynamic = "force-dynamic";

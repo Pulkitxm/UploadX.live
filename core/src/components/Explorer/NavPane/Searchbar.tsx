@@ -1,10 +1,13 @@
 import { Loader2 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
+
+import { FilesContext } from "@/state/context/file";
 
 export default function SearchBar() {
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { searchQuery, setSearchQuery } = useContext(FilesContext);
 
   const ICON = loading ? Loader2 : FaSearch;
 
@@ -22,6 +25,8 @@ export default function SearchBar() {
         type="text"
         placeholder="Search for files"
         className="h-full flex-grow border-none bg-transparent outline-none"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
     </div>
   );

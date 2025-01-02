@@ -1,7 +1,5 @@
-import { RES_TYPE } from "../../types/global.js";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { RES_TYPE } from "../../types/global";
+import prisma from "./index";
 
 export async function getIdFromUsername({
   username,

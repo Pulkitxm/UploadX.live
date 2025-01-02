@@ -37,6 +37,8 @@ export async function sendVerificationEmail({ email, userId }: { userId?: string
       })
     });
 
+    console.log({ email, code, verifyUrl, resDb, res });
+
     if (res.error) {
       console.log("sendVerificationEmail error:", res.error);
 
@@ -49,8 +51,7 @@ export async function sendVerificationEmail({ email, userId }: { userId?: string
     return {
       status: "success",
       data: {
-        verifyCodeChangeAttempts: resDb.data.verifyCodeChangeAttempts,
-        verifyUrl
+        verifyCodeChangeAttempts: resDb.data.verifyCodeChangeAttempts
       }
     };
   } catch (error) {
