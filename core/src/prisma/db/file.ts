@@ -70,6 +70,28 @@ export async function getFilesDB({ userId }: { userId: string }): Promise<RES_TY
   }
 }
 
+export async function getSizeUsedDB({ userId }: { userId: string }): Promise<RES_TYPE<number>> {
+  try {
+    const files = await db.file.findMany({
+      where: {
+        userId,
+        isDeleted: false
+      },
+      select: {
+        sizeInBytes: true
+      }
+    });
+    const sizeUsed = files.reduce((acc, file) => acc + file.sizeInBytes, 0);
+    return { status: "success", data: sizeUsed };
+  } catch (error) {
+    console.error("Error getting size used from database:", error);
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
+  }
+}
+
 export async function deleteFileDB({ id, userId }: { id: string; userId: string }): Promise<RES_TYPE> {
   try {
     await db.file.update({

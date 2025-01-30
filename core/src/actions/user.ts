@@ -2,7 +2,7 @@
 
 import { sendVerificationEmail } from "@/actions/sendEmail";
 import { auth } from "@/auth";
-import { deleteFileDB, getFilesDB, renameFileDB } from "@/prisma/db/file";
+import { deleteFileDB, getFilesDB, getSizeUsedDB, renameFileDB } from "@/prisma/db/file";
 import { editUserDB } from "@/prisma/db/user";
 import { getAttemptsLeft, resetPassword, verifyUser } from "@/prisma/db/user";
 import { ERROR } from "@/types/error";
@@ -230,7 +230,7 @@ export async function deleteFile(id: string): Promise<RES_TYPE> {
   };
 }
 
-export async function renameFile({ id, newName }: { id: string; newName: string }): Promise<RES_TYPE> {
+export async function renameFile({ id, newName }: { id: string; newName: string }): Promise<RES_TYPE<number>> {
   try {
     const res = await getUserSessionData();
     if (res.status === "error") return res;
@@ -252,4 +252,31 @@ export async function renameFile({ id, newName }: { id: string; newName: string 
     status: "error",
     error: ERROR.UNKNOWN
   };
+}
+
+export async function getStorageUsed(): Promise<RES_TYPE<number>> {
+  try {
+    const res = await getUserSessionData();
+    if (res.status === "error") return res;
+
+    const filesRes = await getSizeUsedDB({
+      userId: res.data
+    });
+
+    if (filesRes.status === "error") return filesRes;
+
+    if (filesRes.data === undefined)
+      return {
+        status: "error",
+        error: ERROR.DB_ERROR
+      };
+
+    return filesRes;
+  } catch (error) {
+    console.log("getStorageUsed -> error", error);
+    return {
+      status: "error",
+      error: ERROR.DB_ERROR
+    };
+  }
 }

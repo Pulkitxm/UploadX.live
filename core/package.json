@@ -7,6 +7,7 @@
     "gen": "prisma generate",
     "clean": "rm -rf .next && rm -rf node_modules",
     "ins": "pnpm install --shamefully-hoist && pnpm gen",
+    "ins:clean": "pnpm clean && pnpm ins",
     "gen:clean": "pnpm clean && pnpm ins",
     "dev:clean": "pnpm clean && pnpm ins && pnpm run dev",
     "build": "next build",

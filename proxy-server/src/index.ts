@@ -10,9 +10,17 @@ import {
   SECRET,
   SERVER_NAME,
 } from "./constants";
+import cors from "cors";
 import { getIdFromUsername, isFilePrivate } from "./prisma/db/project";
 
 const app = express();
+app.use(
+  cors({
+    origin: APP_URL,
+    methods: ["GET"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 
 const proxy = httpProxy.createProxyServer({

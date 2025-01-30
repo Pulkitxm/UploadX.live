@@ -1,3 +1,4 @@
+import axios from "axios";
 import { File, Star, Lock, MoreVertical, Trash2, Download, Eye, Pencil, Share2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import React, { useState } from "react";
@@ -98,13 +99,33 @@ export function FileItem({ file, deleteFile, isSelected, onSelect }: FileItemPro
               <Eye className="mr-2 h-4 w-4" /> View
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() =>
-                window.open(`${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/${username}/${file.name}?download=true`, "_blank")
-              }
+              onClick={async () => {
+                try {
+                  showToast({
+                    message: "Downloading...",
+                    type: "loading",
+                    promise: axios({
+                      url: `${NEXT_PUBLIC_ASSETS_SERVR_BASE_URL}/${username}/${file.name}?download=true`,
+                      method: "GET",
+                      responseType: "blob"
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    }).then((response: any) => {
+                      const url = window.URL.createObjectURL(new Blob([response.data]));
+                      const link = document.createElement("a");
+                      link.href = url;
+                      link.setAttribute("download", file.name);
+                      document.body.appendChild(link);
+                      link.click();
+                    })
+                  });
+                } catch (error) {
+                  console.error("Download failed", error);
+                }
+              }}
             >
               <Download className="mr-2 h-4 w-4" /> Download
             </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => setIsRenameDialogOpen(true)}>
+            <DropdownMenuItem onClick={() => setIsRenameDialogOpen(true)}>
               <Pencil className="mr-2 h-4 w-4" /> Rename
             </DropdownMenuItem>
             <DropdownMenuItem
